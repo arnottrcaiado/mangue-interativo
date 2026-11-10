@@ -415,12 +415,12 @@ Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da
 
 ## 15. Autoria, créditos e licença
 
-- **Autor(a) e concepção:** `[preencher: nome]` — `[preencher: instituição / contato]`
-- **Projeto:** Mangue Interativo — `[preencher: contexto, ex.: disciplina, oficina, exposição]`
+- **Autor(a) e concepção:** `Arnott Ramos Caiado, Samantha Pimentel e estudantes` — `Faculdade Senac PE`
+- **Projeto:** Mangue Interativo — `desenvolvido ao longo de jornada IoT Roadmap - 2026-2`
 - **Desenvolvimento assistido por IA:** Claude (Anthropic) — ver [seção 16](#16-notas-sobre-o-uso-de-ia-generativa-iag).
 - **Bibliotecas de terceiros:** Adafruit NeoPixel (Adafruit), WiFiManager (tzapu), core arduino-esp32 (Espressif).
 - **Algoritmos de referência:** OKLab/OKLCh (Björn Ottosson, 2020); Jogo da Vida (John H. Conway, 1970).
-- **Licença:** `[preencher: ex.: MIT]` — sem licença declarada, todos os direitos ficam reservados ao(à) autor(a).
+- **Licença:** `MIT` — sem licença declarada, todos os direitos ficam reservados ao(à) autor(a).
 
 ---
 
