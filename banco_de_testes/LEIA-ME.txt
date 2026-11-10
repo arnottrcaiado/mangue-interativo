@@ -1,0 +1,1 @@
+Banco de testes no PC. Nao substitui testar na placa. Ver README.md, secao 11.

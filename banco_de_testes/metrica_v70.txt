@@ -1,0 +1,13 @@
+emocao        brilho    modulacao    maior salto   quedas<50%
+               medio    (max-min)   entre frames     da media
+espera            89         403%           229%           16
+alegria          115         374%           231%           21
+sede              47         609%           410%           16
+susto            102         276%           178%           35
+amor              79         337%           194%            3
+raiva            168         300%           195%           30
+sono              12         435%           295%            0
+curioso          143         370%           217%           22
+confuso          162         397%           237%           20
+MEDIA modulacao 389% | pior salto 410% | quedas totais (15 s x 9) 163
+TRANSICAO alegria->susto: brilho minimo durante a troca = 21% do menor brilho estavel (origem/destino)

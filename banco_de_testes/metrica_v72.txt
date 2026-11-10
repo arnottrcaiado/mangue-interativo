@@ -1,0 +1,14 @@
+emocao      brilho  modulacao  salto bruto     quedas        salto
+             medio  percebida entre frames       <50%   percebido*
+espera         116        12%          10%          0         1.8%
+alegria        140         8%           9%          0         1.8%
+sede           107        12%           6%          0         1.1%
+susto           89        14%           4%          0         0.9%
+amor            86        14%          12%          0         2.0%
+raiva          159        15%           6%          0         1.2%
+sono            21        16%          18%          0         3.2%
+curioso        171        10%           5%          0         0.8%
+confuso        214        12%           5%          0         0.9%
+MEDIA modulacao percebida 13% | pior salto percebido 3.2% | quedas totais (15 s x 9) 0
+TRANSICAO alegria->susto: brilho minimo durante a troca = 100% do menor brilho estavel (origem/destino)
+* luminancia total integrada pelo olho (~40 ms), salto em janelas de 20 ms

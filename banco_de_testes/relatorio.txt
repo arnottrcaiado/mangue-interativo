@@ -1,0 +1,177 @@
+
+== Evidencias sobre a V6.0 ==
+  ESPERA (40,40,40)      frames com rosto APAGADO: 31/40 (78%), valor min do canal mais forte: 0
+  ALEGRIA (0,150,0)      frames com rosto APAGADO:  0/40 (0%), valor min do canal mais forte: 3
+  TENTANDO (0,150,200)   frames com rosto APAGADO:  0/40 (0%), valor min do canal mais forte: 4
+  map(-100..100 -> 0..7): ocorrencias por coluna: 29 29 28 29 28 29 28 1 
+  (coluna 7 so e atingida com eixo exatamente = 1.00; eixoY nunca e atualizado -> py fixo em 3)
+
+== Testes da V7.0 ==
+  [OK ] Ao ligar: painel de verificacao (checklist) aparece antes do rosto
+  [OK ] Ao ligar, sensor ainda nao testado aparece 'a verificar' (nao 'nao instalado')
+  [OK ] QMI8658 inicializado sem bloquear (WHO_AM_I, reset, CTRL lidos de volta)
+  [OK ] Posicao de repouso calibrada automaticamente
+  [OK ] Sequencia de despertar terminou em ROSTO
+  [OK ] Verificacao inicial termina sozinha (<= 6 s) e da lugar ao rosto
+  [OK ] Servidor web iniciado apos ligacao Wi-Fi
+  [OK ] Rosto nunca apaga (9 emocoes x 150 frames, piso >= 1)
+  escala do rosto: 0.91..1.00, maior variacao por frame 0.0013
+  luminancia percebida em susto: variacao 34%, maior salto entre frames 4.2%
+  [OK ] Respiracao continua (sem saltos de tamanho)
+  [OK ] Ritmo respiratorio acelerou no susto
+  [OK ] Sem saltos de brilho > 5% entre frames
+  erro maximo OKLCh ida-e-volta: 0.000 niveis (de 255)
+  [OK ] Conversao de cor perceptual exata (< 1 nivel)
+  [OK ] Abanar a placa -> SUSTO
+  [OK ] 3 abanoes em 10 s -> RAIVA
+  [OK ] Inclinar devagar NAO causa susto
+  [OK ] Inclinar para +X -> pupilas rolam para +X
+  [OK ] Em ALEGRIA a inclinar, olhos abrem para mostrar o olhar
+  [OK ] Pessoa a 45 cm -> CURIOSO
+  [OK ] Pessoa presente > 8 s com energia -> AMOR
+  [OK ] Pessoa a < 12 cm -> olhos convergem (vesgo)
+  [OK ] Objeto imovel a 50 cm ignorado apos 45 s
+  [OK ] HC-SR04 desligado -> 'ausente', sem marcar ERRO
+  [OK ] HC-SR04 religado -> detetado de novo
+  [OK ] Wi-Fi perdido > 5 s -> CONFUSO
+  [OK ] Icone Wi-Fi aparece quando o problema comeca
+  [OK ] Wi-Fi recuperado -> ALEGRIA transitoria (alivio)
+  [OK ] IMU desligado -> ERRO apos 3 falhas
+  [OK ] IMU religado -> recuperacao com backoff
+  [OK ] Solo seco (<30%) -> SEDE
+  [OK ] Solo humido (>40%) -> sai de SEDE (histerese)
+  [OK ] Inatividade > 90 s -> protetor de ecra
+  [OK ] Mexer na planta -> acorda
+  [OK ] Pixel do indicador nao e usado por nenhum rosto (9 emocoes + olhos X)
+  [OK ] Tudo bem -> indicador apagado (sem noticias = boas noticias)
+  [OK ] HC-SR04 ausente -> 'nao instalado', indicador apagado
+  [OK ] Erro do IMU -> painel abre primeiro (indicador escondido enquanto o painel mostra tudo)
+  indicador em erro: vermelho 26..26 (fixo)
+  [OK ] Erro do IMU -> indicador vermelho fixo (nao pisca)
+  rosto durante erro do IMU: cromaticidade vs paleta, erro 0.032
+  [OK ] Erro do IMU NAO muda a cor do rosto (continua na paleta)
+  [OK ] IMU recuperado -> indicador apaga sozinho
+  [OK ] Queda de Wi-Fi < 5 s nao alarma (debounce)
+  [OK ] Queda curta recuperada sem 'alivio' falso
+  [OK ] Queda > 5 s -> CONFUSO + icone Wi-Fi (uma vez)
+  [OK ] Wi-Fi em aviso -> indicador ambar a pulsar devagar
+  [OK ] Reage e acalma: CONFUSO termina (sem ficar 'preso')
+  [OK ] Sem ninguem a olhar, o icone NAO se repete (40 s)
+  [OK ] Alguem chega (>60 s depois) -> icone relembrado
+  [OK ] Wi-Fi de volta -> alivio (ALEGRIA) e indicador apagado
+  [OK ] Historico regista a queda e a recuperacao do Wi-Fi
+  [OK ] Quatro icones em quadrantes separados, sem sobreposicao
+  [OK ] Toque curto no BOOT -> painel com icones verdes (OK)
+  [OK ] Segundo toque fecha o painel
+  [OK ] Sensor nao instalado -> icone cinzento (neutro, nao alarma)
+  painel automatico no erro do IMU: IMU #160000, Wi-Fi (atenuado) #000502
+  [OK ] Erro novo -> painel abre sozinho, icone culpado vermelho e os outros atenuados
+  [OK ] Painel automatico fecha sozinho (5 s)
+  [OK ] Erro persistente: painel relembrado quando alguem interage (>60 s)
+  anel aos 2,9 s: 15 de 28 pixels
+  [OK ] Segurar o BOOT -> anel de progresso enche na moldura (metade aos 2,9 s)
+  [OK ] Largar antes dos 5 s cancela (nada acontece)
+  [OK ] Segurar 5 s -> abre portal Wi-Fi (servidor liberta a porta 80, timeout 3 min)
+  [OK ] Portal aberto -> Wi-Fi em 'atencao' (indicador ambar)
+  [OK ] Portal fechado -> servidor web volta sozinho
+  [OK ] Botao 'Mostrar na placa' (API) abre o painel
+  [OK ] Placa de pe na posicao normal -> rosto a 0 graus
+  [OK ] Antes de 0,4 s estavel, ainda nao roda (debounce)
+  tempo ate comecar a girar: 521 ms (filtro de gravidade + 400 ms de estabilidade)
+  [OK ] Chao a esquerda -> comeca a girar para 90 graus em 0,4-0,7 s
+  giro animado: maior passo por frame 3.0 graus
+  [OK ] Giro animado suave termina exatamente em 90 graus
+  [OK ] LEDs fisicos = vista rodada 90 graus (permutacao exata, boca do lado do chao)
+  [OK ] Nova posicao vira o novo repouso (olhar centrado, sono possivel)
+  olhar com rosto a 90 graus: pupila (0.57, -0.05)
+  [OK ] Olhar segue a gravidade no referencial do rosto rodado
+  [OK ] A 12 graus do lado: mantem (dentro da janela)
+  [OK ] A 40 graus (entre janelas): mantem a ultima orientacao (histerese)
+  [OK ] A 10 graus do lado de baixo: volta a 0 graus
+  [OK ] De cabeca para baixo -> 180 graus
+  [OK ] 180 graus: LED fisico (x,y) = vista (7-x, 7-y)
+  [OK ] Chao a direita -> 270 graus
+  [OK ] Inclinacao breve (< 0,4 s) nao roda o rosto
+  [OK ] Placa deitada (inclinada 30 graus) -> nao roda
+  [OK ] API rejeita auto invalido
+  [OK ] Fixar na pagina -> fica na posicao ATUAL (90 graus), como o bloqueio do telemovel
+  [OK ] Com rotacao fixa, girar a placa nao muda o rosto
+  [OK ] Estado da rotacao na API
+  [OK ] Religar -> roda logo para a posicao atual (180 graus)
+  giro a mao (90 graus/0,4 s): agitacao maxima 0.28 g (susto a partir de 0.80 g)
+  [OK ] Girar a placa a mao roda o rosto SEM causar susto
+  [OK ] Volta completa (360 graus) termina na posicao normal
+  sem correcao, placa real direita -> rosto a 270 graus (anti-horario = 270)
+  [OK ] Reproduz o defeito: sem correcao o rosto fica 90 graus anti-horario
+  [OK ] Correcao de fabrica (+90 graus): rosto direito nas 4 posicoes
+  calibracao: {"ok":true,"estado":"concluido","msg":"Calibrado: sensor a 90 graus (desvio 0 graus)."}
+  [OK ] Calibracao em 2 passos encontra a montagem real (90 graus) e guarda-a
+  [OK ] Depois de calibrar: rosto direito nas 4 posicoes
+  placa espelhada sem calibrar: erro por posicao (quartos) 2 0 2 0
+  calibracao (espelhada): {"ok":true,"estado":"concluido","msg":"Calibrado: sensor a 90 graus e espelhado (desvio 0 graus)."}
+  [OK ] Montagem espelhada detetada pela calibracao
+  [OK ] Espelhada calibrada: rosto direito nas 4 posicoes
+  [OK ] Montagem a 180 graus calibrada: rosto direito nas 4 posicoes
+  [OK ] Calibrar com a placa deitada -> pede para a pôr de pe (409)
+  [OK ] Passo 2 que nao esta a 90 graus -> pede para recomecar
+  [OK ] Passo 2 sem passo 1 -> recusado
+  [OK ] Passo invalido -> 400
+  [OK ] Repor montagem de fabrica
+  [OK ] Placa real com montagem de fabrica: rosto direito nas 4 posicoes
+  [OK ] Placa real: inclinar para a direita -> pupilas para a direita
+  [OK ] API mostra a montagem do sensor
+  [OK ] Montagem errada: placa direita mostra o rosto torto (270)
+  [OK ] Um toque em girar endireita JA o rosto e aprende a correcao (guardada)
+  [OK ] Depois de girar uma vez, a rotacao automatica acerta as 4 posicoes
+  [OK ] Girar anti-horario desfaz (simetria)
+  [OK ] API rejeita sentido invalido
+  [OK ] Fixo: girar muda a posicao fixa (guardada)
+  [OK ] Fixo: mexer na placa nao muda o rosto
+  [OK ] Voltar a automatica -> segue a placa outra vez
+  [OK ] Duplo toque no BOOT -> modo girar (sem abrir o painel)
+  [OK ] Modo girar mostra o icone de girar
+  [OK ] Modo girar: cantos acesos indicam 'a espera do botao'
+  [OK ] No modo girar, um toque gira 90 graus (imediato)
+  [OK ] Quatro toques = volta completa
+  [OK ] Segurar no modo girar mostra o anel (rapido)
+  [OK ] Segurar 1,5 s fixa a orientacao e sai do modo (nao abre o Wi-Fi)
+  [OK ] Repetir (duplo toque + segurar) solta o cadeado
+  [OK ] Modo girar sai sozinho apos 10 s sem tocar
+  [OK ] Toque simples continua a abrir o painel (apos a janela de 350 ms)
+  show(): 69235 chamadas, 0 fora do loop/setup
+  [OK ] show() (usa ~6 KB de pilha na lib) e chamado so a partir do loop()/setup()
+  [OK ] Depois de um crash: motivo 'panic' e modulo 'desenho' identificados
+  [OK ] Crashes seguidos sao contados (reinicio em ciclo detetavel)
+  [OK ] Ligar normalmente zera a contagem
+  [OK ] RAM RTC com lixo (ligar a frio) e tratada com seguranca
+  [OK ] API/pagina mostram o motivo do ultimo reinicio e o modulo
+  [OK ] API mostra a pilha livre minima medida
+  [OK ] API rejeita emocao desconhecida (400)
+  [OK ] API rejeita brilho fora de 5-100
+  [OK ] Brilho 25% aplicado e guardado na flash
+  [OK ] API rejeita paleta desconhecida
+  [OK ] API rejeita cor mal formatada
+  [OK ] API rejeita cor quase preta (rosto sumiria)
+  tema: espera/alegria de cada paleta vs original dE>=0.150
+  [OK ] Trocar de paleta muda visivelmente as emocoes mais frequentes
+  paletas: par mais parecido dE=0.085, mais perto de ERRO/TENTANDO dE=0.110
+  [OK ] Todas as paletas: emocoes distinguiveis e longe das cores de hardware
+  [OK ] Paleta oceano aplicada e guardada
+  cromaticidade nos LEDs vs paleta oceano/alegria: erro 0.001
+  [OK ] LEDs mostram a cor da nova paleta
+  [OK ] /api/matriz devolve 64 pixels RRGGBB
+  [OK ] Espelho da pagina = valores reais enviados aos LEDs
+  [OK ] Solo desligado -> 'nao instalado', nivel geral continua OK (nao e erro)
+  [OK ] Solo religado -> detetado de novo
+  ordem GRB (V7.4): espelho #000D0A -> LED fisico #0D000A
+  [OK ] Reproduz o defeito: com GRB o LED fisico troca vermelho e verde
+  ordem RGB (V7.5): espelho #000D0A -> LED fisico #000D0A
+  [OK ] Com RGB o LED fisico mostra a mesma cor que o espelho
+  [OK ] Explica o sintoma: vermelho de ERRO enviado em GRB acende VERDE numa matriz RGB
+  [OK ] Botao 'Testar cores' mostra vermelho, verde e azul puros
+  [OK ] Teste de cores termina sozinho (6 s)
+  [OK ] API rejeita ordem de cor invalida
+  [OK ] Cor unica #FF8800 em todas as emocoes e guardada
+  [OK ] Energia < 20 -> SONO
+
+Resultado: 0 falha(s)
