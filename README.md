@@ -415,7 +415,7 @@ Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da
 
 ## 15. Autoria, créditos e licença
 
-- **Autor(a) e concepção:** `Arnott Ramos Caiado, Samantha Pimentel e estudantes` — `Faculdade Senac PE`
+- **Autor(a) e concepção:** `professores Arnott Ramos Caiado, Samantha Pimentel e estudantes Jamile Keiller e Júlia Cássia` — `Faculdade Senac PE`
 - **Projeto:** Mangue Interativo — `desenvolvido ao longo de jornada IoT Roadmap - 2026-2`
 - **Desenvolvimento assistido por IA:** Claude (Anthropic) — ver [seção 16](#16-notas-sobre-o-uso-de-ia-generativa-iag).
 - **Bibliotecas de terceiros:** Adafruit NeoPixel (Adafruit), WiFiManager (tzapu), core arduino-esp32 (Espressif).
