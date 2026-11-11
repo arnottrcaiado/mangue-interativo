@@ -1,6 +1,6 @@
 // Banco de testes no PC: compila o .ino real com stubs, verifica comportamentos
 // e exporta frames (para pré-visualização). Uso: ./teste <pasta_saida>
-#include "../Mangue_Interativo_V7/Mangue_Interativo_V7.ino"
+#include "../Mangue_Interativo_V7_11/Mangue_Interativo_V7_11.ino"
 #include <vector>
 #include <fstream>
 #include <array>
