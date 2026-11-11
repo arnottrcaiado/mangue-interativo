@@ -26,12 +26,13 @@
 9. [Configuração (`#define`)](#9-configuração-define)
 10. [Decisões de projeto e evidências](#10-decisões-de-projeto-e-evidências)
 11. [Banco de testes](#11-banco-de-testes)
-12. [Limitações conhecidas](#12-limitações-conhecidas)
-13. [Roadmap](#13-roadmap)
-14. [Histórico de versões](#14-histórico-de-versões)
-15. [Autoria, créditos e licença](#15-autoria-créditos-e-licença)
-16. [Notas sobre o uso de IA Generativa (IAG)](#16-notas-sobre-o-uso-de-ia-generativa-iag)
-17. [Referências](#17-referências)
+12. [Resolução de problemas](#12-resolução-de-problemas)
+13. [Limitações conhecidas](#13-limitações-conhecidas)
+14. [Roadmap](#14-roadmap)
+15. [Histórico de versões](#15-histórico-de-versões)
+16. [Autoria, créditos e licença](#16-autoria-créditos-e-licença)
+17. [Notas sobre o uso de IA Generativa (IAG)](#17-notas-sobre-o-uso-de-ia-generativa-iag)
+18. [Referências](#18-referências)
 
 ---
 
@@ -44,6 +45,16 @@ O projeto tem três objetivos:
 - **Expressivo** — comunicar estados de forma imediata e afetiva, numa resolução de apenas 64 pixels.
 - **Robusto** — multitarefa real (tudo com `millis()`), recuperação automática de falhas de sensores e de rede.
 - **Usável** — sinalização de sistema separada das emoções, diagnóstico na própria placa e na web, decisões baseadas em medições.
+
+### Estrutura do repositório
+
+| Caminho | Conteúdo |
+|---|---|
+| `Mangue_Interativo_V7_11/Mangue_Interativo_V7_11.ino` | Firmware completo (arquivo único) — é este que se grava na placa |
+| `banco_de_testes/` | Compila o firmware no PC com *stubs* e verifica o comportamento (ver [seção 11](#11-banco-de-testes)) |
+| `preview/` | Imagens e animações geradas pelo próprio motor visual |
+| `PROMPT.md` | Prompt que descreve o projeto final, para reproduzir ou estender com IA |
+| `LICENSE` | Licença MIT |
 
 ---
 
@@ -101,7 +112,7 @@ Espelho ao vivo da matriz (sempre "em pé", como a pessoa vê) · selo de estado
 | Sensor de umidade do solo **capacitivo** (ex.: v1.2) | opcional | Detectado automaticamente; sem ele a planta não sente sede |
 | Sensor ultrassônico **HC-SR04** | opcional | Detectado automaticamente; exige divisor de tensão no ECHO |
 | Resistores 1 kΩ + 2 kΩ | se usar HC-SR04 | Divisor 5 V → 3,3 V |
-| DHT11/22, APDS9960 | futuro | Ainda **não** integrados no firmware (ver [Roadmap](#13-roadmap)) |
+| DHT11/22, APDS9960 | futuro | Ainda **não** integrados no firmware (ver [Roadmap](#14-roadmap)) |
 
 ### 3.2 Mapa de pinos
 
@@ -175,7 +186,7 @@ HC-SR04                ESP32-S3-Matrix
    - **WiFiManager** (tzapu), **≥ 2.0** — necessária para `getConfigPortalActive()` e o modo não bloqueante.
    - `WebServer`, `ESPmDNS`, `Preferences`, `Wire` já vêm com o core ESP32.
 3. **Placa**: *ESP32S3 Dev Module* · **USB CDC On Boot: Enabled** (para o Monitor Serial pela USB nativa) · *Flash Size* conforme o seu módulo (a ESP32-S3-Matrix usa 4 MB).
-4. Abra `Mangue_Interativo_V7/Mangue_Interativo_V7.ino` e grave.
+4. Abra `Mangue_Interativo_V7_11/Mangue_Interativo_V7_11.ino` e grave. (A Arduino IDE exige que o `.ino` fique numa pasta com o mesmo nome; por isso a pasta e o arquivo levam a versão.)
 5. Monitor Serial a **115200** baud para ver o diagnóstico (`[IMU]`, `[SAUDE]`, `[REDE]`, `[ESTADO]`…).
 
 > Se a gravação falhar: segure **BOOT**, pressione **RESET**, solte **BOOT** e grave de novo.
@@ -345,7 +356,7 @@ A pasta `banco_de_testes/` compila **o `.ino` real** no PC com *stubs* do Arduin
 ```bash
 cd banco_de_testes
 g++ -std=gnu++17 -O2 -Istubs -x c++ teste.cpp -o teste && ./teste out     # 145 verificações
-g++ -std=gnu++17 -O2 -Istubs -DINO='"../Mangue_Interativo_V7/Mangue_Interativo_V7.ino"' \
+g++ -std=gnu++17 -O2 -Istubs -DINO='"../Mangue_Interativo_V7_11/Mangue_Interativo_V7_11.ino"' \
     -x c++ metrica.cpp -o metrica && ./metrica                              # métricas de "piscar"
 python3 render.py out/frames.txt out                                       # PNG/GIF (Pillow)
 # Página: pagina_web/servidor.py + testar_pagina.js (Chrome real, npm i puppeteer-core)
@@ -370,9 +381,9 @@ Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da
 
 **Pilha (stack):** o `loop()` do ESP32 tem 8 KB por padrão e o `show()` da Adafruit NeoPixel (core 3.x) reserva ~6 KB na pilha para 64 LEDs. O firmware pede 16 KB (`SET_LOOP_TASK_STACK_SIZE`), chama `show()` direto do `loop()` e mantém buffers grandes estáticos. A "pilha livre" mínima aparece no rodapé da página.
 
-## 12b. Limitações conhecidas
+## 13. Limitações conhecidas
 
-- **Não validado em hardware pelo processo de desenvolvimento assistido** — a validação foi feita em simulação; teste na placa antes de uso permanente.
+- **Validação dividida** — a lógica foi verificada no banco de testes (no PC); o comportamento na placa foi observado pela equipe na Waveshare ESP32-S3-Matrix. Outras revisões da placa ou montagens podem diferir: teste na sua placa antes de uso permanente.
 - **GPIO5/6 do HC-SR04** foram escolhidos sem confirmação do pinout exposto; ajuste se necessário.
 - **Rotação**: a montagem padrão (+90°) vem de um teste numa placa real; outras revisões podem diferir — use ↻ ou a calibração completa. A rotação de 90° na grade 8×8 é exata.
 - **Valores de registro do QMI8658** vêm do datasheet/drivers de referência; o sentido dos eixos face à matriz deve ser calibrado.
@@ -383,7 +394,7 @@ Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da
 
 ---
 
-## 13. Roadmap
+## 14. Roadmap
 
 - [ ] **APDS9960**: gestos (carinho → AMOR) e luz ambiente (brilho automático e ciclo de sono).
 - [ ] **DHT11/22**: temperatura/umidade do ar; compensar a velocidade do som no HC-SR04 (v = 331,3 + 0,606·T).
@@ -393,7 +404,7 @@ Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da
 
 ---
 
-## 14. Histórico de versões
+## 15. Histórico de versões
 
 | Versão | Principais mudanças |
 |---|---|
@@ -413,18 +424,18 @@ Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da
 
 ---
 
-## 15. Autoria, créditos e licença
+## 16. Autoria, créditos e licença
 
-- **Autor(a) e concepção:** `professores Arnott Ramos Caiado, Samantha Pimentel e estudantes Jamile Keiller e Júlia Cássia` — `Faculdade Senac PE`
-- **Projeto:** Mangue Interativo — `desenvolvido ao longo de jornada IoT Roadmap - 2026-2`
-- **Desenvolvimento assistido por IA:** Claude (Anthropic) — ver [seção 16](#16-notas-sobre-o-uso-de-ia-generativa-iag).
+- **Autoria e concepção:** professores Arnott Ramos Caiado e Samantha Pimentel; estudantes Jamile Keiller e Júlia Cássia — Faculdade Senac PE.
+- **Projeto:** Mangue Interativo, desenvolvido ao longo da jornada [IoT & Maker RoadMap 2026/2](https://tutorpesquisa.pythonanywhere.com/iotmaker2026).
+- **Desenvolvimento assistido por IA:** Claude (Anthropic) — ver [seção 17](#17-notas-sobre-o-uso-de-ia-generativa-iag).
 - **Bibliotecas de terceiros:** Adafruit NeoPixel (Adafruit), WiFiManager (tzapu), core arduino-esp32 (Espressif).
 - **Algoritmos de referência:** OKLab/OKLCh (Björn Ottosson, 2020); Jogo da Vida (John H. Conway, 1970).
-- **Licença:** `MIT` — sem licença declarada, todos os direitos ficam reservados ao(à) autor(a).
+- **Licença:** [MIT](LICENSE). Pode usar, modificar e redistribuir, mantendo o aviso de copyright e a licença.
 
 ---
 
-## 16. Notas sobre o uso de IA Generativa (IAG)
+## 17. Notas sobre o uso de IA Generativa (IAG)
 
 Este projeto foi desenvolvido com **assistência de Inteligência Artificial Generativa**, declarada aqui por transparência.
 
@@ -445,7 +456,7 @@ Este projeto foi desenvolvido com **assistência de Inteligência Artificial Gen
 **Como o resultado foi verificado**
 - 145 verificações automáticas do firmware e 22 da página num navegador Chrome real.
 - Métricas comparativas entre versões (seção 10) e imagens geradas pelo código real.
-- Fontes técnicas citadas na seção 17.
+- Fontes técnicas citadas na seção 18.
 
 **O que NÃO foi verificado pela IA**
 - Compilação no toolchain arduino-esp32 e execução na placa física (o ambiente de desenvolvimento não tinha acesso ao hardware nem ao toolchain).
@@ -460,7 +471,7 @@ O arquivo [`PROMPT.md`](PROMPT.md) contém um prompt completo que descreve o pro
 
 ---
 
-## 17. Referências
+## 18. Referências
 
 - Waveshare — *ESP32-S3-Matrix* (página do produto e wiki): <https://www.waveshare.com/wiki/ESP32-S3-Matrix>
 - ESPHome Devices — *Waveshare ESP32-S3 Matrix* (pinout: QMI8658 em GPIO11/12, LED em GPIO14): <https://devices.esphome.io/devices/waveshare-esp32s3-matrix/>
