@@ -86,3 +86,5 @@ if pal:
             px = dict(pal)["pal:%s:%s" % (n, e)]
             S.paste(led_img(px, cel), (esq + j * (w + pad), topo + i * (w + pad)))
     S.save(f"{dst}/paletas.png"); print(f"{dst}/paletas.png")
+if sel("img:"): folha(sel("img:"), 2, "Mangue V7.14 - arvore DuMangue na placa", f"{dst}/imagem_placa.png")
+if sel("prot:dumangue"): gif(sel("prot:dumangue"), f"{dst}/protetor_dumangue.gif", ms=100)

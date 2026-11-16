@@ -14,6 +14,6 @@ struct WebServer {
   void send(int c, const char*, const char* body) { ultimoCodigo = c; ultimaResposta = String(body); }
   void send_P(int c, const char* t, const char* b) { send(c, t, b); }
   // "nome"/"valor" -> argNome ; "duracao"/"cor" -> argDur
-  String arg(const char* n) { return (strcmp(n, "nome") == 0 || strcmp(n, "valor") == 0 || strcmp(n, "auto") == 0 || strcmp(n, "passo") == 0 || strcmp(n, "sentido") == 0) ? argNome : argDur; }
-  bool hasArg(const char* n) { return (strcmp(n, "duracao") == 0 || strcmp(n, "cor") == 0) && !argDur.s.empty(); }
+  String arg(const char* n) { return (strcmp(n, "nome") == 0 || strcmp(n, "valor") == 0 || strcmp(n, "auto") == 0 || strcmp(n, "passo") == 0 || strcmp(n, "sentido") == 0 || strcmp(n, "acao") == 0) ? argNome : argDur; }
+  bool hasArg(const char* n) { return (strcmp(n, "duracao") == 0 || strcmp(n, "cor") == 0 || strcmp(n, "protetor") == 0 || strcmp(n, "reacoes") == 0) && !argDur.s.empty(); }
 };

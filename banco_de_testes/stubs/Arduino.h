@@ -34,6 +34,7 @@ extern int simBotao;
 inline int digitalRead(int p) { return p == 0 ? simBotao : 0; }
 inline int digitalPinToInterrupt(int p) { return p; }
 inline void attachInterrupt(int, void (*)(), int) {}
+inline void detachInterrupt(int) {}
 extern int simSoloMv;
 inline uint32_t analogReadMilliVolts(int) { return simSoloMv; }
 struct SerialStub {
@@ -53,6 +54,7 @@ class String {
   bool equalsIgnoreCase(const char* o) const { return strcasecmp(s.c_str(), o) == 0; }
   long toInt() const { return atol(s.c_str()); }
   const char* c_str() const { return s.c_str(); }
+  unsigned length() const { return (unsigned)s.size(); }
 };
 struct EspStub { uint32_t getFreeHeap() { return 200000; } };
 extern EspStub ESP;

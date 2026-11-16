@@ -1,7 +1,7 @@
-# Prompt de geração — Mangue Interativo (firmware v7.11)
+# Prompt de geração — Mangue Interativo (firmware v7.17)
 
 > **Como usar:** copie tudo a partir de "PROMPT" para uma ferramenta de IA generativa com capacidade de programação.
-> Este prompt descreve o resultado **final** de um processo iterativo (V6.0 → V7.11) e incorpora as lições aprendidas
+> Este prompt descreve o resultado **final** de um processo iterativo (V6.0 → V7.17) e incorpora as lições aprendidas
 > (seção "Armadilhas conhecidas"). Preencha os campos `[...]` se quiser personalizar.
 
 ---
@@ -18,7 +18,7 @@ Gerar o firmware completo (arquivo único `.ino`, Arduino/arduino-esp32 2.x e 3.
 - Placa **Waveshare ESP32-S3-Matrix**: matriz WS2812B 8×8 no **GPIO14** (ordem de bytes **RGB**, não GRB); IMU **QMI8658** em I2C **SDA 11 / SCL 12**, endereço **0x6B** (alternativo 0x6A); botão **BOOT = GPIO0** (LOW = pressionado, usável após o boot).
 - Opcionais, **detectados automaticamente** (ausência ≠ erro):
   - Sensor de umidade do solo capacitivo no **GPIO4** (ADC1; ADC2 conflita com o Wi-Fi). Leitura com `analogReadMilliVolts`, 8 amostras, calibração `SOLO_MV_SECO=2800`, `SOLO_MV_MOLHADO=1200`; sede com histerese (entra < 30%, sai > 40%). Leituras < 50 mV ou > 3150 mV por 3 vezes → "ausente".
-  - **HC-SR04**: TRIG GPIO5, ECHO GPIO6 com **divisor 1 kΩ/2 kΩ** (ECHO é 5 V). Medição por **interrupção CHANGE** no ECHO (proibido `pulseIn`), ciclo 70 ms, mediana de 3, 58 µs/cm, > 25 ms = "nada". Sem resposta em 10 disparos → ausente; enquanto não decidir, estado "a verificar" com sondagem rápida; depois de ausente, sondar a cada 2 s. Pino ECHO com `INPUT_PULLDOWN`.
+  - **HC-SR04**: TRIG GPIO5, ECHO GPIO6 com **divisor 1 kΩ/2 kΩ** (ECHO é 5 V). Medição por **interrupção CHANGE** no ECHO (proibido `pulseIn`), ciclo 60 ms, 58 µs/cm, > 25 ms = sem eco. **Tratamento das leituras** (obrigatório; o ruído real tornava as reações instáveis): (1) só valem 2–400 cm; falhas de eco são ignoradas e só 4 seguidas = "nada"; (2) saltos > max(20 cm, 350 cm/s·dt) e reaparecimentos após "nada" só são aceites se as 2 leituras seguintes concordarem (±12 cm + 350 cm/s·dt, comparando com a candidata anterior); aí reinicia o filtro e a 1.ª leitura da cadeia entra no histórico; (3) mediana de 3 de leituras válidas + filtro 1€ (Casiez 2012; fcmin 1,5 Hz, β 0,06, fd 1 Hz) que dá distância e velocidade; (4) presença: entra < 60 cm por 120 ms, sai > 75 cm por 700 ms; (5) pessoa vs parede pela amplitude da distância filtrada em 3 s (> 2,5 cm; sem atividade 45 s = mobília); (6) susto se, sobre leituras aceites (histórico de 8), se aproximou > 25 cm em 400 ms e fica < 30 cm em 2 leituras seguidas, ou surgiu confirmado < 30 cm; interação se |v| > 20 cm/s e < 150 cm; (7) **proximidade contínua** p = smoothstep((120 − d)/110), 0 se nada/sem sensor/mobília; suavizada por frame (sobe τ 70 ms, desce τ 450 ms); olhar ao centro se p > 0,08; convergência 0,7·smoothstep((25 − d)/15); amplitude respiratória ×(1 − 0,65p); ritmo ×(1 + 0,45p); brilho ×(1 + 0,2p); impulso vertical na pupila se v < −45 cm/s (pausa 700 ms). Vigilância elétrica: a ISR conta bordas; > 300 bordas/s (normal ~29) → `detachInterrupt` 5 s + aviso. JSON `us`: detectado, cm, perto, bruto, qualidade (%), vel (cm/s), bordas_s, rajadas, prox; a página mostra "leitura instável" se qualidade < 80%. Sem resposta em 10 disparos → ausente; enquanto não decidir, estado "a verificar" com sondagem rápida; depois de ausente, sondar a cada 2 s. Pino ECHO com `INPUT_PULLDOWN`.
 - Futuro (não implementar, só deixar ganchos documentados): APDS9960, DHT.
 
 ### Restrições de arquitetura
@@ -57,7 +57,7 @@ Prioridade: **transitória** (SUSTO 3 s; RAIVA 6 s quando há 3 sustos em 10 s; 
 - Bocas (linhas 5–7): NEUTRA, SORRISO, TRISTE, O, ONDULADA, DENTES, PEQUENA, TORTA, BEIJO. Sobrancelhas na linha 0.
 - Tabela de expressões (olhoE, olhoD, boca, sobrancelhas, cor RGB, respirações/min, amplitude, intensidade):
   espera NORMAL/NORMAL/NEUTRA (90,90,110) 10 0,08 0,80 · alegria FELIZ/FELIZ/SORRISO (0,170,30) 14 0,10 1,0 · sede SEMICERRADO/SEMICERRADO/ONDULADA (170,80,0) 8 0,06 0,80 · susto NORMAL/NORMAL/O, sobr. `11100111` (120,0,200) 24 0,10 1,0 · amor CORACAO/CORACAO/BEIJO (220,20,100) 12 0,12 1,0 · raiva ZANGADO/ZANGADO/DENTES (220,40,0) 22 0,10 1,0 · sono FECHADO/FECHADO/PEQUENA (40,50,140) 6 0,06 0,60 · curioso NORMAL/NORMAL/PEQUENA (5,173,96) 16 0,08 0,95 · confuso NORMAL/SEMICERRADO/TORTA, sobr. `11100000` (160,140,0) 12 0,08 0,90.
-- **Pupila escura** anti-aliased (bilinear). **Física mola-amortecedor**: k = 14, c = 6,5 (ζ ≈ 0,87), ganho de inclinação 30, ricochete −0,4 nas bordas. Alvo: pessoa presente → centro (e **vesgo** a < 12 cm, convergência 0,7); sem estímulo → sacadas aleatórias (±0,6, ±0,4) a cada 3–7 s. Se houver inclinação ou pessoa, olhos FELIZ passam a NORMAL (senão o olhar fica invisível).
+- **Pupila escura** anti-aliased (bilinear). **Física mola-amortecedor**: k = 14, c = 6,5 (ζ ≈ 0,87), ganho de inclinação 30, ricochete −0,4 nas bordas. Alvo: pessoa presente ou proximidade > 0,08 → centro (convergência contínua até 0,7 entre 25 e 10 cm); sem estímulo → sacadas aleatórias (±0,6, ±0,4) a cada 3–7 s. Se houver inclinação ou pessoa, olhos FELIZ passam a NORMAL (senão o olhar fica invisível).
 - Pálpebras: despertar (1,4 s) e adormecer (2,2 s) suaves; **pestanejar desligado** por padrão (`PISCAR_OLHOS 0`; se ligado, 4–9 s, sem piscada dupla).
 - Crossfade de rosto 900 ms (smoothstep).
 
@@ -75,6 +75,34 @@ Prioridade: **transitória** (SUSTO 3 s; RAIVA 6 s quando há 3 sustos em 10 s; 
   *(se recalcular, valide os limiares acima e reporte os valores obtidos).*
 
 **Protetor de tela** (após 90 s sem interação, sem emoção manual/transitória/portal/painel/pessoa): pálpebras fecham → fade 1,5 s → rotação a cada 40 s entre **Maré** (plasma de senos, paleta água/mangue, lento), **Jogo da Vida** (toro 8×8, 1 geração/700 ms, fade, reinício se estagnar/período 2/150 gerações, cor por idade) e **Vaga-lumes** (5, Lissajous, brilho cosseno², rastro). Qualquer interação acorda.
+
+**Imagem DuMangue** (logótipo do autor) em 8×8, **o mais parecida possível com a árvore do logo**. Método: (1) silhueta medida — recortar a árvore (sem o texto), engrossar os traços (raio 9 px), cobertura média por bloco; ligado se cobertura ≥ 12%; (2) materiais desenhados como no logo — folhas à esquerda (L/l, dois verdes), circuito à direita (T trilhas + N pads verde-menta nas pontas), tronco entrelaçado (T/t alternados), raízes; (3) brilho ×(0,45 + 0,55·densidade); normalizar o máximo a 255. Validar contra o logo: sobreposição de silhueta ≥ 0,9 e correlação ≥ 0,7 (obtido: 0,952 e 0,775).
+```
+. . l L T N . .      L/l = folha (40,230,60)/(25,160,40)   N = pad (150,255,175)
+. L l L T T N .      T/t = trilha (20,150,45)/(10,80,25)
+l L l L T N T N
+L l L l T T T N
+L l . l T . N T
+. . . T t . . .
+. . . t T . . .
+. . T t T T . .
+```
+Tabela final do firmware (RGB):
+```
+  {0,0,0}, {0,0,0}, {19,120,30}, {35,203,53}, {19,142,42}, {111,188,130}, {0,0,0}, {0,0,0},
+  {0,0,0}, {30,175,45}, {28,177,44}, {44,255,67}, {22,166,50}, {19,137,41}, {105,180,123}, {0,0,0},
+  {16,96,24}, {44,255,67}, {28,177,44}, {44,255,67}, {22,163,49}, {142,241,165}, {18,135,41}, {100,171,116},
+  {34,197,51}, {28,177,44}, {44,255,67}, {28,177,44}, {22,166,50}, {18,133,40}, {20,149,44}, {119,201,137},
+  {41,236,62}, {28,177,44}, {0,0,0}, {23,151,38}, {22,166,50}, {0,0,0}, {128,216,149}, {18,134,40},
+  {0,0,0}, {0,0,0}, {0,0,0}, {17,128,39}, {11,89,28}, {0,0,0}, {0,0,0}, {0,0,0},
+  {0,0,0}, {0,0,0}, {0,0,0}, {9,75,23}, {22,166,50}, {0,0,0}, {0,0,0}, {0,0,0},
+  {0,0,0}, {0,0,0}, {16,114,34}, {11,89,28}, {22,166,50}, {20,151,45}, {0,0,0}, {0,0,0},
+```
+"Seiva": fator por linha 0,82 + 0,18·exp(−(y/7 − pos)²/0,03), com pos a subir das raízes à copa a cada 3,5 s. Página: pré-visualização (`GET /api/imagem`), Mostrar 15 s / Manter / Voltar ao rosto (`POST /api/imagem?acao=`), opção "no protetor" (`?protetor=`, persistida). Protetor: sequência MARE → LOGO → VIDA → LOGO → VAGALUMES → LOGO (logo 20 s, animações 40 s; LOGO saltado se desativado). A imagem é composta na "vista" (roda com a placa), abaixo do painel de estado; mantém a planta acordada enquanto ativa.
+
+**Humor de base fixo** (`POST /api/humor?nome=<emoção|auto>&reacoes=0|1`, persistido): prioridade reação (se permitida) > botão de 10 s > humor fixo > automático. Na página: cartão próprio "Humor de base · permanente" (separado dos botões de 10 s), seletor (Automático + 🔒 emoções), checkbox "continuar a reagir" (desativada sem humor fixo), chip com o humor fixo e "(fixo)" junto da emoção atual.
+
+**Nova posição de repouso:** inclinada (`emMovimento`) e imóvel (agitação < 0,05 g) por 5 s → recalibrar o repouso (ex.: pousar a placa que estava de pé); sem isto, olhar preso e a planta nunca dorme.
 
 **Teste de cores** (web): 6 s com a matriz inteira em vermelho → verde → azul puros.
 
@@ -100,7 +128,7 @@ Tema por variáveis CSS derivado da paleta (fundo/cartões/botões a partir da c
 - Rodapé: uptime, RSSI, heap, loop máx (µs), FPS.
 
 ### API
-GET `/`, `/api/estado`, `/api/saude`, `/api/matriz`; POST `/api/rotacao?auto=`, `/api/girar?sentido=`, `/api/orientacao?passo=`, `/api/emocao?nome=&duracao=`, `/api/brilho?valor=`, `/api/paleta?nome=&cor=`, `/api/ordem?nome=`, `/api/teste_cor`, `/api/painel`, `/api/acordar`, `/api/protetor`, `/api/calibrar`. Validar parâmetros (HTTP 400 com mensagem). mDNS `mangue.local`. AP de configuração `Mangue_Interativo_AP`.
+GET `/`, `/api/estado`, `/api/saude`, `/api/matriz`, `/api/imagem`; POST `/api/imagem?acao=|protetor=`, `/api/humor?nome=&reacoes=`, `/api/rotacao?auto=`, `/api/girar?sentido=`, `/api/orientacao?passo=`, `/api/emocao?nome=&duracao=`, `/api/brilho?valor=`, `/api/paleta?nome=&cor=`, `/api/ordem?nome=`, `/api/teste_cor`, `/api/painel`, `/api/acordar`, `/api/protetor`, `/api/calibrar`. Validar parâmetros (HTTP 400 com mensagem). mDNS `mangue.local`. AP de configuração `Mangue_Interativo_AP`.
 
 ### Diagnóstico
 Reinícios: motivo (`esp_reset_reason`) e módulo onde ocorreu o crash (migalhas RTC), contagem de crashes seguidos, pilha livre mínima — no Monitor Série (`[DIAG]`) e no rodapé da página.
@@ -137,6 +165,9 @@ Construir um **banco de testes no PC** que compila o `.ino` real com *stubs* (Ar
 - montagem: simular o chip rodado (−90°) e espelhado; reproduzir o defeito sem correção (rosto a 270° com a placa direita); correção de fábrica acerta as 4 posições; calibração de 2 passos encontra rotação, espelho e 180°; recusa placa deitada/posições não a 90°;
 - girar/fixar: um toque em ↻ endireita e aprende (4 posições certas depois); ↺ desfaz; fixo mantém a posição; duplo toque/toque/segurar 1,5 s no BOOT; saída por inatividade; toque simples continua a abrir o painel;
 - rotação: 0° de pé; 90° após 0,4–0,7 s com giro ≤ 8°/frame terminando exato; LEDs físicos = vista rodada (90°: físico (x,y) = vista (y, 7−x); 180°: (7−x, 7−y)); janela de 15° e histerese a 40°; inclinação breve não roda; placa deitada não roda; olhar correto no referencial rodado; repouso recalibrado; girar à mão (90° em 0,4 s) **não** causa susto; desligar volta a 0° e fixa;
+- imagem: 40 LEDs, verde dominante; mostrar/manter/parar; seiva sem saltos (≤ 2 níveis/frame); roda com a placa; sequência do protetor; desligar no protetor;
+- humor fixo: mantém-se sem interação; botões de 10 s por cima; reage e volta; sem reações não sai; automático volta a seguir a base calculada; persistência;
+- pousar a placa (de pé → deitada) vira novo repouso e a planta volta a dormir;
 - APIs válidas/ inválidas (400); JSON válido.
 Medir e reportar: modulação de luminância por emoção, pior salto entre frames e quedas bruscas. Testar a página num navegador real (servidor de imitação + puppeteer) e gerar pré-visualizações PNG/GIF **a partir do próprio motor**.
 

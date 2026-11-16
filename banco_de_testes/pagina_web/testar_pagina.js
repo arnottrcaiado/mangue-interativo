@@ -73,6 +73,27 @@ const espera = ms => new Promise(r => setTimeout(r, ms));
   await fetch('http://127.0.0.1:8765/modo?e=oceano'); await espera(1500);
   const off2 = await p.$eval('#offline', x => getComputedStyle(x).display);
   verifica(off2 === 'none', 'Ligacao de volta -> faixa desaparece sozinha');
+  // Humor de base (permanente) — separado dos botões de 10 s
+  const opcoes = await p.$$eval('#humor option', o => o.map(x => x.value));
+  verifica(opcoes.length === 10 && opcoes[0] === 'auto', `Seletor de humor: Automatico + 9 emocoes (${opcoes.length})`);
+  const reacDis = await p.$eval('#reacoes', x => x.disabled);
+  verifica(reacDis === true, 'Sem humor fixo, a opcao "continuar a reagir" fica desativada (nao confunde)');
+  await p.select('#humor', 'amor'); await espera(300);
+  await p.evaluate(() => { const c = document.querySelector('#reacoes'); c.disabled = false; c.click(); });
+  await espera(300);
+  const ph = await (await fetch('http://127.0.0.1:8765/posts')).json();
+  verifica(ph.includes('/api/humor?nome=amor') && ph.some(x => x.startsWith('/api/humor?reacoes=')), 'Escolher humor e reacoes envia POST /api/humor');
+  const botoes10s = await p.$$eval('#botoes button', b => b.length);
+  verifica(botoes10s === 9, 'Botoes de emocao de 10 s continuam iguais (9)');
+  // Imagem DuMangue: pré-visualização com os mesmos LEDs da placa
+  const imgAcesos = await p.evaluate(() => [...document.querySelectorAll('#imgWeb i')].filter(i => i.style.background).length);
+  verifica(imgAcesos === 40, `Pre-visualizacao da arvore (${imgAcesos} LEDs)`);
+  await p.click('button[onclick="post(\'/api/imagem?acao=mostrar\')"]'); await espera(300);
+  const pi = await (await fetch('http://127.0.0.1:8765/posts')).json();
+  verifica(pi.includes('/api/imagem?acao=mostrar'), 'Botao "Mostrar (15 s)" envia POST /api/imagem');
+  await p.evaluate(() => document.querySelector('#humor').scrollIntoView());
+  await p.evaluate(() => window.scrollBy(0, -80));
+  await p.screenshot({ path: `${OUT}/web_humor_imagem.png` });
   // Orientação: interruptor de rotação automática
   const rotTxt = await p.$eval('#rotPos', x => x.textContent);
   const rotChk = await p.$eval('#btnAuto', x => x.classList.contains('on'));

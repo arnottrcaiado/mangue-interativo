@@ -1,6 +1,6 @@
 // Banco de testes no PC: compila o .ino real com stubs, verifica comportamentos
 // e exporta frames (para pré-visualização). Uso: ./teste <pasta_saida>
-#include "../Mangue_Interativo_V7_11/Mangue_Interativo_V7_11.ino"
+#include "../Mangue_Interativo_V7/Mangue_Interativo_V7.ino"
 #include <vector>
 #include <fstream>
 #include <array>
@@ -197,6 +197,21 @@ static void testesV7(const char* pasta) {
   VERIFICA(olhos.convergencia > 0.4f, "Pessoa a < 12 cm -> olhos convergem (vesgo)");
   distancia(999); avancar(500); distancia(999); avancar(3000);
 
+  // 6b. Proximidade contínua (v7.17): reage antes da "presença", sem limiares
+  { olhos.alvoX = 0.6f; olhos.tProximaSacada = millis() + 60000;
+    distancia(90); avancar(300);
+    VERIFICA(olhos.prox > 0.1f && olhos.alvoX == 0 && !pessoaPresente(millis()),
+             "Algo a 90 cm: olhar vira-se em < 300 ms (antes de haver 'presenca')");
+    float p90 = olhos.prox; distancia(40); avancar(400); float p40 = olhos.prox;
+    distancia(15); avancar(400); float p15 = olhos.prox;
+    printf("  proximidade: 90 cm %.2f | 40 cm %.2f | 15 cm %.2f\n", p90, p40, p15);
+    VERIFICA(p90 < p40 && p40 < p15, "Proximidade cresce continuamente ao aproximar");
+    distancia(999); avancar(300);
+    VERIFICA(olhos.prox > 0.3f, "Ao afastar, a proximidade desce devagar (sem corte brusco)");
+    avancar(3000);
+    VERIFICA(olhos.prox < 0.02f, "Sem ninguem, proximidade volta a 0");
+    olhos.tProximaSacada = millis(); }
+
   // 7. Objeto imovel (parede a 50 cm) deixa de contar como pessoa
   distancia(50); avancar(500);
   for (int i = 0; i < 100; i++) { distancia(50); avancar(500); }
@@ -388,9 +403,12 @@ static void testesV7(const char* pasta) {
     avancar(2000);
     VERIFICA(imu.calibrado && !mov.emMovimento, "Nova posicao vira o novo repouso (olhar centrado, sono possivel)");
     // olhar no referencial do rosto: chao desce um pouco para baixo-fisico -> pupila vai para +x do rosto
+    // (alvo fixo ao centro: mede-se só a gravidade, não o sorteio das sacadas)
+    olhos.alvoX = olhos.alvoY = 0; olhos.tProximaSacada = millis() + 60000;
     simQmi.ax = -0.95f; simQmi.ay = 0.31f; avancar(1500);
-    printf("  olhar com rosto a 90 graus: pupila (%.2f, %.2f)\n", olhos.px, olhos.py);
+    printf("  olhar com rosto a 90 graus: pupila (%.2f, %.2f) prox %.2f dist %.0f alvo %.2f,%.2f\n", olhos.px, olhos.py, olhos.prox, us.distCm, olhos.alvoX, olhos.alvoY);
     VERIFICA(olhos.px > 0.3f && rot.quarto == 1, "Olhar segue a gravidade no referencial do rosto rodado");
+    olhos.tProximaSacada = millis();
     // janela de 15 graus e histerese
     gravidade(78); avancar(1500);
     VERIFICA(rot.quarto == 1, "A 12 graus do lado: mantem (dentro da janela)");
@@ -577,6 +595,103 @@ static void testesV7(const char* pasta) {
              "API/pagina mostram o motivo do ultimo reinicio e o modulo");
     VERIFICA(strstr(server.ultimaResposta.c_str(), "\"pilha_livre\":9000") != nullptr, "API mostra a pilha livre minima medida");
     simMotivoReinicio = ESP_RST_POWERON; analisarReinicio();
+  }
+
+  // 11h. IMAGEM DUMANGUE
+  { auto img = [](const char* acao, const char* prot = "") { server.argNome = String(acao); server.argDur = String(prot); rotaImagemPost(); };
+    int acesos = 0, maxc = 0; for (int i = 0; i < NUM_LEDS; i++) { int m = max(IMAGEM_DUMANGUE[i][0], max(IMAGEM_DUMANGUE[i][1], IMAGEM_DUMANGUE[i][2])); acesos += m > 0; maxc = max(maxc, m); }
+    bool soVerde = true; for (int i = 0; i < NUM_LEDS; i++) if (IMAGEM_DUMANGUE[i][0] || IMAGEM_DUMANGUE[i][2]) if (IMAGEM_DUMANGUE[i][1] < IMAGEM_DUMANGUE[i][0] || IMAGEM_DUMANGUE[i][1] < IMAGEM_DUMANGUE[i][2]) soVerde = false;
+    VERIFICA(acesos == 40 && maxc == 255 && soVerde, "Arvore do logotipo 8x8: 40 LEDs, verde dominante em todos");
+    rotaImagemGet(); { std::ofstream j(std::string(pasta) + "/web_imagem.txt"); j << server.ultimaResposta.c_str(); }
+    VERIFICA(strlen(server.ultimaResposta.c_str()) == 384, "GET /api/imagem devolve 64 pixels RRGGBB");
+    pedirEmocao("espera"); avancar(3000);
+    img("mostrar"); avancar(1200);
+    // a vista deve ser a imagem (proporcional, com seiva) e nao o rosto
+    { float melhor = 0; int ip = 0; for (int i = 0; i < NUM_LEDS; i++) { float s0 = IMAGEM_DUMANGUE[i][1]; if (s0 > melhor) { melhor = s0; ip = i; } }
+      bool forma = true; for (int i = 0; i < NUM_LEDS; i++) { bool on = espelho[i][1] > 0, deve = IMAGEM_DUMANGUE[i][1] > 0; if (on != deve && i != INDICADOR_Y * 8 + INDICADOR_X) forma = false; }
+      exportar("img:mostrar na pagina");
+      VERIFICA(imagem.ativa && forma && espelho[ip][1] > espelho[ip][0], "Mostrar -> a matriz mostra a arvore (mesmos 40 LEDs) em verde"); }
+    // seiva: o brilho varia devagar e pouco (sem piscar)
+    { int mn = 999, mx = 0, salto = 0, ant = -1; int i = 7 * 8 + 3;
+      for (int f = 0; f < 400; f++) { avancar(10); int v = espelho[i][1]; mn = min(mn, v); mx = max(mx, v); if (ant >= 0) salto = max(salto, abs(v - ant)); ant = v; }
+      printf("  seiva na raiz: verde %d..%d, maior salto entre frames %d nivel(is)\n", mn, mx, salto);
+      VERIFICA(mx > mn && salto <= 2, "Imagem tem movimento suave (seiva), sem saltos bruscos"); }
+    avancar(DURACAO_IMAGEM_MS);
+    VERIFICA(!imagem.ativa, "Mostrar termina sozinho aos 15 s e volta ao rosto");
+    img("manter"); avancar(DURACAO_IMAGEM_MS + 5000);
+    VERIFICA(imagem.ativa && imagem.manter && vis.modo == ModoEcra::ROSTO, "Manter: continua na tela depois de 15 s");
+    img("parar"); avancar(800);
+    VERIFICA(!imagem.ativa && imagem.alfa < 0.05f, "Voltar ao rosto: imagem sai com transicao suave");
+    img("xyz"); VERIFICA(server.ultimoCodigo == 400, "Acao invalida -> 400");
+    img("", "7"); VERIFICA(server.ultimoCodigo == 400, "Protetor invalido -> 400");
+    // rotacao: a imagem gira com a placa (arvore sempre direita)
+    { float f = 90 * PI / 180; simQmi.ax = -sinf(f); simQmi.ay = cosf(f); simQmi.az = 0; avancar(2000);
+      img("manter"); avancar(1500);
+      bool ok = true; for (int y = 0; y < 8; y++) for (int x = 0; x < 8; x++) { uint8_t c[3]; matriz.corFisica(y * 8 + x, c); int iv = (7 - x) * 8 + y; if (abs(c[1] - espelho[iv][1]) > 1) ok = false; }
+      exportar("img:placa rodada 90 graus (LEDs fisicos)");
+      VERIFICA(rot.quarto == 1 && ok, "Com a placa rodada, a imagem roda junto (arvore direita)");
+      img("parar"); simQmi.ax = 0; simQmi.ay = 1; simQmi.az = 0; avancar(2000);     // endireitar (0 graus)
+      simQmi.ax = 0; simQmi.ay = 0; simQmi.az = 1; avancar(NOVO_REPOUSO_MS + 4000); }  // e deitar, parada (vira repouso)
+    // protetor: animacoes alternam com a imagem
+    rotaProtetor(); avancar(500);
+    VERIFICA(vis.modo == ModoEcra::PROTETOR, "Protetor ativo para o teste da sequencia");
+    TipoProtetor seq[8]; for (int k = 0; k < 7; k++) { seq[k] = prot.tipo; prot.tInicio = millis() - duracaoProtetor(prot.tipo) + 50; avancar(100); }
+    const char* NOMES[] = {"mare", "vida", "vagalumes", "logo"};
+    printf("  sequencia do protetor:"); for (int k = 0; k < 7; k++) printf(" %s", NOMES[(int)seq[k]]); printf("\n");
+    VERIFICA(seq[0] == TipoProtetor::MARE && seq[1] == TipoProtetor::LOGO && seq[2] == TipoProtetor::VIDA && seq[3] == TipoProtetor::LOGO &&
+             seq[4] == TipoProtetor::VAGALUMES && seq[5] == TipoProtetor::LOGO && seq[6] == TipoProtetor::MARE, "Protetor: mare -> imagem -> vida -> imagem -> vaga-lumes -> imagem -> ...");
+    // protetor a mostrar a imagem: exportar e verificar forma
+    for (int g = 0; g < 10 && prot.tipo != TipoProtetor::LOGO; g++) { prot.tInicio = millis() - duracaoProtetor(prot.tipo) + 50; avancar(100); }
+    avancar(3000);
+    for (int f = 0; f < 35; f++) { avancar(100); char e[40]; snprintf(e, 40, "prot:dumangue %d", f); exportar(e); }
+    { bool forma = true; for (int i = 0; i < NUM_LEDS; i++) { bool on = espelho[i][1] > 0, deve = IMAGEM_DUMANGUE[i][1] > 0; if (on != deve) forma = false; }
+      VERIFICA(forma, "No protetor, a imagem aparece com a mesma forma"); }
+    img("", "0"); VERIFICA(!imagem.noProtetor && preferencias.getUChar("logoprot", 9) == 0, "Desmarcar 'no protetor' (guardado)");
+    { bool viuLogo = false; for (int k = 0; k < 8; k++) { prot.tInicio = millis() - duracaoProtetor(prot.tipo) + 50; avancar(100); if (prot.tipo == TipoProtetor::LOGO) viuLogo = true; }
+      VERIFICA(!viuLogo, "Sem a opcao, o protetor so mostra as animacoes"); }
+    img("", "1");
+    rotaEstado(); VERIFICA(strstr(server.ultimaResposta.c_str(), "\"imagem\":{\"ativa\":false,\"manter\":false,\"no_protetor\":true}") != nullptr, "Estado da imagem na API");
+    registarInteracao(millis()); avancar(4000);
+  }
+
+  // 11h2. NOVA POSICAO DE REPOUSO (pousar a placa)
+  { simQmi.ax = 0; simQmi.ay = 1; simQmi.az = 0; avancar(NOVO_REPOUSO_MS + 3000);   // de pe tempo suficiente: vira repouso
+    simQmi.ax = 0; simQmi.ay = 0; simQmi.az = 1; avancar(1500);           // pousada na mesa
+    bool inclinadaAntes = mov.emMovimento;
+    avancar(NOVO_REPOUSO_MS + 2000);
+    VERIFICA(inclinadaAntes && !mov.emMovimento && imu.calibrado, "Pousar a placa: inclinada+imovel 5 s vira o novo repouso");
+    avancar(TEMPO_PROTETOR_MS + 5000);
+    VERIFICA(vis.modo == ModoEcra::PROTETOR, "Depois de pousada, a planta volta a conseguir dormir");
+    registarInteracao(millis()); avancar(3000);
+  }
+
+  // 11i. HUMOR DE BASE FIXO
+  { auto humor = [](const char* nome, const char* reac = "") { server.argNome = String(nome); server.argDur = String(reac); rotaHumor(); };
+    humor("amor"); avancar(1500);
+    VERIFICA(emo.baseFixa && emo.atual == Emocao::AMOR && preferencias.getUChar("humor", 99) == (uint8_t)Emocao::AMOR, "Fixar humor 'amor' -> rosto fica em amor (guardado)");
+    avancar(INTERACAO_RECENTE_MS + 10000);
+    VERIFICA(emo.atual == Emocao::AMOR, "Humor fixo mantem-se sem interacao (nao volta a 'espera')");
+    pedirEmocao("susto", "3"); avancar(500);
+    VERIFICA(emo.atual == Emocao::SUSTO, "Botoes de 10 s continuam a funcionar por cima do humor fixo");
+    avancar(3500);
+    VERIFICA(emo.atual == Emocao::AMOR, "Depois dos 10 s volta ao humor fixo (nao ao automatico)");
+    // reacoes ligadas: sacudir -> susto -> volta a amor
+    simQmi.ax = 1.6f; avancar(30); simQmi.ax = -1.2f; avancar(30); simQmi.ax = 0; avancar(300);
+    VERIFICA(emo.atual == Emocao::SUSTO, "Com reacoes: sacudir ainda assusta");
+    avancar(DURACAO_SUSTO_MS + 1000);
+    VERIFICA(emo.atual == Emocao::AMOR, "Reage e volta ao humor fixo");
+    // reacoes desligadas
+    humor("", "0"); avancar(300);
+    VERIFICA(!emo.reacoes && preferencias.getUChar("reacoes", 9) == 0, "Desligar reacoes (guardado)");
+    simQmi.ax = 1.6f; avancar(30); simQmi.ax = -1.2f; avancar(30); simQmi.ax = 0; avancar(300);
+    VERIFICA(emo.atual == Emocao::AMOR, "Sem reacoes: sacudir nao tira do humor fixo");
+    humor("", "1"); avancar(DURACAO_SUSTO_MS + 500);
+    humor("xpto"); VERIFICA(server.ultimoCodigo == 400, "Humor desconhecido -> 400");
+    humor("", "5"); VERIFICA(server.ultimoCodigo == 400, "Reacoes invalido -> 400");
+    rotaEstado(); VERIFICA(strstr(server.ultimaResposta.c_str(), "\"humor\":{\"fixo\":\"amor\",\"reacoes\":true}") != nullptr, "Estado do humor na API");
+    humor("auto"); avancar(INTERACAO_RECENTE_MS + 5000);
+    printf("  automatico: emocao '%s' (energia %.0f, pessoa %d, sede %d)\n", expressaoDe(emo.atual).nome, emo.energia, pessoaPresente(millis()), solo.comSede);
+    VERIFICA(!emo.baseFixa && emo.atual == calcularEmocaoBase(millis()) && preferencias.getUChar("humor", 0) == 255, "Automatico: volta a seguir sensores e energia");
   }
 
   // 12. API web

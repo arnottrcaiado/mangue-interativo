@@ -16,6 +16,7 @@ class H(http.server.BaseHTTPRequestHandler):
             f=f"{OUT}/web_saude_{estado['atual']}.json"
             if not os.path.exists(f): f=f"{OUT}/saude.json"
             return self.env(200,'application/json',open(f).read())
+        if u.path=='/api/imagem': return self.env(200,'text/plain',open(f"{OUT}/web_imagem.txt").read())
         if u.path=='/api/estado': return self.env(200,'application/json',open(f"{OUT}/web_estado_{estado['atual']}.json").read())
         if u.path=='/api/matriz': return self.env(200,'text/plain',open(f"{OUT}/web_matriz_{estado['atual']}.txt").read())
         if u.path=='/modo':

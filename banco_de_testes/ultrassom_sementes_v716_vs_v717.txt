@@ -1,0 +1,321 @@
+versao|semente|cenario|nome|trocasPresenca|sustos|trocasEmocao|trocasVesgo|tPresenca|tAmor|tSusto|tFimPresenca|interacoes|presente_fim|reage|prox|dmax
+v716|1|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|11|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|1|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|15|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|1|6|Pessoa sai aos 10 s|2|0|3|0|312|8313|-1|10952|1|nao|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|1|3|Pessoa a 20 cm (20 s)|1|1|3|0|312|8313|102|-1|2|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|1|7|Muito perto, ~10 cm (20 s)|1|1|3|1|312|8313|102|-1|2|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|2|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2552|-1|5|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|1|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|312|8313|-1|-1|32|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|1|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|312|8313|-1|-1|1|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|2|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|13|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|2|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|2|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|3|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|12|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|3|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|3|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|3|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|11|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|2|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|4|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|12|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|2|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|30|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|1|2|Parede a 50 cm (70 s)|2|0|3|0|452|8453|-1|45452|1|nao|reage 452|prox 9.000--1.000|dmax/ms 0.0000
+v716|2|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|4|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|10|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|3|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|4|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|4|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|5|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|12|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|5|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2552|-1|5|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|4|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|5|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|6|5|Aproximacao lenta 120->40 cm em 5 s|1|1|3|0|6122|-1|10322|-1|18|sim|reage 6122|prox 9.000--1.000|dmax/ms 0.0000
+v716|5|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|6|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2552|-1|5|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|3|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|25|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|3|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|7|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|11|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|5|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|7|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|11|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|6|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|2|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|6|7|Muito perto, ~10 cm (20 s)|1|1|3|3|242|8243|32|-1|3|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|4|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|28|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|8|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2832|-1|2622|-1|6|sim|reage 2832|prox 9.000--1.000|dmax/ms 0.0000
+v716|4|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|6|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|8|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|10|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|7|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|9|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2692|-1|2622|-1|9|sim|reage 2692|prox 9.000--1.000|dmax/ms 0.0000
+v716|7|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|7|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10882|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|9|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|10|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|10|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|10|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|5|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|5|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|24|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|8|3|Pessoa a 20 cm (20 s)|1|1|3|0|382|8383|172|-1|4|sim|reage 382|prox 9.000--1.000|dmax/ms 0.0000
+v716|11|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|10|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|8|7|Muito perto, ~10 cm (20 s)|1|1|3|1|382|8383|172|-1|2|sim|reage 382|prox 9.000--1.000|dmax/ms 0.0000
+v716|10|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|13|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|8|6|Pessoa sai aos 10 s|2|1|4|0|382|8383|172|10952|6|nao|reage 382|prox 9.000--1.000|dmax/ms 0.0000
+v716|3|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|6|1|Pessoa parada a 45 cm (30 s)|1|1|4|0|242|8243|8922|-1|7|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|6|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|21|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|12|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2552|-1|5|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|9|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|11|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6262|-1|-1|-1|9|sim|reage 6262|prox 9.000--1.000|dmax/ms 0.0000
+v716|9|6|Pessoa sai aos 10 s|2|1|4|0|242|8243|102|10952|3|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|9|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|3|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|13|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|11|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|12|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6122|-1|-1|-1|15|sim|reage 6122|prox 9.000--1.000|dmax/ms 0.0000
+v716|10|3|Pessoa a 20 cm (20 s)|1|1|3|0|312|8313|102|-1|3|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|10|6|Pessoa sai aos 10 s|2|0|3|0|312|8313|-1|10882|1|nao|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|7|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|7|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|27|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|14|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|11|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|10|7|Muito perto, ~10 cm (20 s)|1|1|3|1|312|8313|102|-1|2|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|13|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6262|-1|-1|-1|12|sim|reage 6262|prox 9.000--1.000|dmax/ms 0.0000
+v716|4|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|15|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2972|-1|2762|-1|9|sim|reage 2972|prox 9.000--1.000|dmax/ms 0.0000
+v716|11|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|11|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|11|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|16|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2692|-1|10|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|8|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|522|8523|-1|-1|33|sim|reage 522|prox 9.000--1.000|dmax/ms 0.0000
+v716|14|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|16|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|8|1|Pessoa parada a 45 cm (30 s)|1|1|3|0|382|8383|172|-1|6|sim|reage 382|prox 9.000--1.000|dmax/ms 0.0000
+v716|12|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|12|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|17|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2692|-1|2482|-1|6|sim|reage 2692|prox 9.000--1.000|dmax/ms 0.0000
+v716|15|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6122|-1|-1|-1|10|sim|reage 6122|prox 9.000--1.000|dmax/ms 0.0000
+v716|12|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|13|6|Pessoa sai aos 10 s|2|0|4|0|242|8243|-1|10952|2|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|18|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2552|-1|5|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|9|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|1|3|0|242|10802|7802|-1|27|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|13|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|3|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|9|1|Pessoa parada a 45 cm (30 s)|1|1|3|0|242|8243|102|-1|3|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|16|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|11|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|5|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|14|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|19|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2762|-1|10|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|17|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|12|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|13|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|3|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|14|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|15|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|20|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|0|2762|-1|2552|-1|5|sim|reage 2762|prox 9.000--1.000|dmax/ms 0.0000
+v716|10|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|312|8313|-1|-1|27|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|10|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|312|8313|-1|-1|1|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|18|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|16|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|16|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|14|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|15|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|6|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|19|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6122|-1|-1|-1|11|sim|reage 6122|prox 9.000--1.000|dmax/ms 0.0000
+v716|17|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|18|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|20|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6192|-1|-1|-1|10|sim|reage 6192|prox 9.000--1.000|dmax/ms 0.0000
+v716|11|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|27|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|11|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|19|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10952|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|15|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|16|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|20|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10882|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|12|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|7|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|12|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|33|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|16|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|17|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|13|1|Pessoa parada a 45 cm (30 s)|1|0|3|0|242|8243|-1|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|8|2|Parede a 50 cm (70 s)|2|0|3|0|382|8383|-1|45382|1|nao|reage 382|prox 9.000--1.000|dmax/ms 0.0000
+v716|18|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|17|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|3|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|14|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|13|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|382|8383|-1|-1|25|sim|reage 382|prox 9.000--1.000|dmax/ms 0.0000
+v716|18|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|19|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|15|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|14|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|312|8313|-1|-1|28|sim|reage 312|prox 9.000--1.000|dmax/ms 0.0000
+v716|19|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|9|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|20|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|16|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|20|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|32|-1|2|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|15|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|28|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|16|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|36|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|17|1|Pessoa parada a 45 cm (30 s)|1|1|4|0|242|8243|11582|-1|3|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|10|2|Parede a 50 cm (70 s)|2|1|4|0|242|8243|32|48322|7|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|17|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|29|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|18|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|18|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|34|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|11|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|19|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|28|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|19|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|20|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|6|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|20|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|21|sim|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|12|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|13|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|14|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|15|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|16|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|17|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|18|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|19|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v716|20|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 242|prox 9.000--1.000|dmax/ms 0.0000
+v717|1|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6002|-1|-1|-1|12|sim|reage 3890|prox 9.000--1.000|dmax/ms 0.0052
+v717|1|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.0993
+v717|1|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|36|sim|reage 140|prox 0.725-0.835|dmax/ms 0.0965
+v717|1|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2582|-1|2642|-1|10|sim|reage 2260|prox 9.000--1.000|dmax/ms 0.0506
+v717|1|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.976-0.981|dmax/ms 0.1295
+v717|2|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2762|-1|11|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0431
+v717|2|6|Pessoa sai aos 10 s|2|0|3|0|302|8303|-1|10922|1|nao|reage 200|prox 9.000--1.000|dmax/ms 0.0983
+v717|2|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|302|8303|-1|-1|37|sim|reage 200|prox 0.711-0.847|dmax/ms 0.0939
+v717|1|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|2|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6062|-1|-1|-1|14|sim|reage 3910|prox 9.000--1.000|dmax/ms 0.0050
+v717|1|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.755-0.780|dmax/ms 0.0999
+v717|2|3|Pessoa a 20 cm (20 s)|1|1|3|0|302|8303|182|-1|2|sim|reage 200|prox 0.975-0.979|dmax/ms 0.1292
+v717|3|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2762|-1|10|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0451
+v717|3|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1001
+v717|3|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6062|-1|-1|-1|13|sim|reage 3920|prox 9.000--1.000|dmax/ms 0.0066
+v717|2|7|Muito perto, ~10 cm (20 s)|1|1|3|1|302|8303|182|-1|2|sim|reage 200|prox 0.999-1.000|dmax/ms 0.1330
+v717|4|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2822|-1|11|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0416
+v717|1|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0927
+v717|5|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2822|-1|10|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0388
+v717|2|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|302|8303|-1|-1|1|sim|reage 200|prox 0.756-0.780|dmax/ms 0.0992
+v717|3|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|41|sim|reage 140|prox 0.703-0.845|dmax/ms 0.0992
+v717|3|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.975-0.983|dmax/ms 0.1298
+v717|4|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1033
+v717|4|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6062|-1|-1|-1|14|sim|reage 3940|prox 9.000--1.000|dmax/ms 0.0052
+v717|3|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|6|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2582|-1|2702|-1|9|sim|reage 2260|prox 9.000--1.000|dmax/ms 0.0477
+v717|5|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.0989
+v717|3|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.749-0.780|dmax/ms 0.1007
+v717|4|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.973-0.981|dmax/ms 0.1309
+v717|7|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2762|-1|10|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0457
+v717|5|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6002|-1|-1|-1|12|sim|reage 3950|prox 9.000--1.000|dmax/ms 0.0050
+v717|4|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|302|8303|-1|-1|31|sim|reage 200|prox 0.716-0.805|dmax/ms 0.0926
+v717|4|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|8|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2582|-1|2642|-1|12|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0408
+v717|6|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6002|-1|-1|-1|15|sim|reage 3940|prox 9.000--1.000|dmax/ms 0.0050
+v717|6|6|Pessoa sai aos 10 s|2|0|3|0|302|8303|-1|10922|1|nao|reage 200|prox 9.000--1.000|dmax/ms 0.0983
+v717|5|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.974-0.983|dmax/ms 0.1293
+v717|2|2|Parede a 50 cm (70 s)|2|0|3|0|302|8303|-1|45302|1|nao|reage 200|prox 0.000-0.706|dmax/ms 0.0924
+v717|4|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.751-0.772|dmax/ms 0.1038
+v717|9|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2642|-1|2702|-1|9|sim|reage 2250|prox 9.000--1.000|dmax/ms 0.0421
+v717|5|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|5|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|302|8303|-1|-1|28|sim|reage 200|prox 0.708-0.825|dmax/ms 0.0984
+v717|7|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6002|-1|-1|-1|12|sim|reage 3850|prox 9.000--1.000|dmax/ms 0.0054
+v717|10|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2822|-1|11|sim|reage 2220|prox 9.000--1.000|dmax/ms 0.0455
+v717|7|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1025
+v717|6|3|Pessoa a 20 cm (20 s)|1|1|3|0|302|8303|182|-1|3|sim|reage 200|prox 0.976-0.985|dmax/ms 0.1292
+v717|6|7|Muito perto, ~10 cm (20 s)|1|1|3|1|302|8303|182|-1|5|sim|reage 200|prox 1.000-1.000|dmax/ms 0.1330
+v717|5|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.755-0.777|dmax/ms 0.0995
+v717|11|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2582|-1|2642|-1|11|sim|reage 2260|prox 9.000--1.000|dmax/ms 0.0551
+v717|8|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6062|-1|-1|-1|10|sim|reage 3870|prox 9.000--1.000|dmax/ms 0.0046
+v717|8|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1017
+v717|7|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.974-0.982|dmax/ms 0.1307
+v717|6|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|542|8543|-1|-1|25|sim|reage 440|prox 0.719-0.823|dmax/ms 0.1097
+v717|12|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2762|-1|10|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0405
+v717|3|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.706|dmax/ms 0.0929
+v717|7|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|9|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6122|-1|-1|-1|14|sim|reage 3880|prox 9.000--1.000|dmax/ms 0.0049
+v717|6|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|302|8303|-1|-1|1|sim|reage 200|prox 0.754-0.779|dmax/ms 0.0992
+v717|8|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.974-0.983|dmax/ms 0.1304
+v717|9|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1012
+v717|13|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2462|-1|2702|-1|10|sim|reage 2310|prox 9.000--1.000|dmax/ms 0.0727
+v717|10|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6002|-1|-1|-1|14|sim|reage 3900|prox 9.000--1.000|dmax/ms 0.0052
+v717|7|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|302|8303|-1|-1|32|sim|reage 200|prox 0.722-0.831|dmax/ms 0.1105
+v717|8|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|14|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2762|-1|11|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0464
+v717|11|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6002|-1|-1|-1|12|sim|reage 3920|prox 9.000--1.000|dmax/ms 0.0051
+v717|10|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.0975
+v717|9|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.974-0.982|dmax/ms 0.1302
+v717|7|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.754-0.777|dmax/ms 0.1031
+v717|15|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2762|-1|11|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0437
+v717|9|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|8|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|362|8363|-1|-1|44|sim|reage 260|prox 0.710-0.817|dmax/ms 0.1018
+v717|12|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|5942|-1|-1|-1|15|sim|reage 3900|prox 9.000--1.000|dmax/ms 0.0051
+v717|11|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.0996
+v717|4|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.704|dmax/ms 0.0940
+v717|16|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2642|-1|2702|-1|10|sim|reage 2240|prox 9.000--1.000|dmax/ms 0.0483
+v717|10|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.974-0.981|dmax/ms 0.1287
+v717|13|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6002|-1|-1|-1|15|sim|reage 3900|prox 9.000--1.000|dmax/ms 0.0054
+v717|10|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1330
+v717|17|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|3|1|2522|-1|2522|-1|6|sim|reage 2420|prox 9.000--1.000|dmax/ms 0.1158
+v717|8|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.755-0.778|dmax/ms 0.1022
+v717|12|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1023
+v717|9|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|38|sim|reage 140|prox 0.715-0.838|dmax/ms 0.1027
+v717|11|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.976-0.982|dmax/ms 0.1296
+v717|18|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2762|-1|10|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0458
+v717|14|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|5942|-1|-1|-1|17|sim|reage 3860|prox 9.000--1.000|dmax/ms 0.0056
+v717|11|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|19|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2462|-1|2642|-1|10|sim|reage 2310|prox 9.000--1.000|dmax/ms 0.0733
+v717|13|6|Pessoa sai aos 10 s|2|0|3|0|302|8303|-1|10922|1|nao|reage 200|prox 9.000--1.000|dmax/ms 0.0997
+v717|9|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.755-0.779|dmax/ms 0.1018
+v717|12|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.975-0.980|dmax/ms 0.1306
+v717|15|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6062|-1|-1|-1|10|sim|reage 3940|prox 9.000--1.000|dmax/ms 0.0066
+v717|20|4|Aproximacao rapida 120->15 cm em 0,5 s|1|1|4|1|2702|-1|2762|-1|11|sim|reage 2230|prox 9.000--1.000|dmax/ms 0.0394
+v717|5|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0925
+v717|10|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|34|sim|reage 140|prox 0.716-0.836|dmax/ms 0.0900
+v717|12|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|14|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1011
+v717|16|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6002|-1|-1|-1|11|sim|reage 3880|prox 9.000--1.000|dmax/ms 0.0048
+v717|13|3|Pessoa a 20 cm (20 s)|1|1|3|0|302|8303|182|-1|2|sim|reage 200|prox 0.975-0.982|dmax/ms 0.1297
+v717|10|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.752-0.774|dmax/ms 0.0981
+v717|11|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|422|8423|-1|-1|40|sim|reage 320|prox 0.716-0.815|dmax/ms 0.1065
+v717|15|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1013
+v717|17|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6062|-1|-1|-1|12|sim|reage 3920|prox 9.000--1.000|dmax/ms 0.0054
+v717|13|7|Muito perto, ~10 cm (20 s)|1|1|3|1|302|8303|182|-1|2|sim|reage 200|prox 0.999-1.000|dmax/ms 0.1331
+v717|14|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.975-0.981|dmax/ms 0.1302
+v717|6|2|Parede a 50 cm (70 s)|2|0|3|0|302|8303|-1|45302|1|nao|reage 200|prox 0.000-0.705|dmax/ms 0.0924
+v717|12|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|242|8243|-1|-1|36|sim|reage 140|prox 0.720-0.826|dmax/ms 0.1062
+v717|11|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.754-0.775|dmax/ms 0.1001
+v717|18|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6062|-1|-1|-1|17|sim|reage 3900|prox 9.000--1.000|dmax/ms 0.0052
+v717|16|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1036
+v717|14|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|15|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.975-0.983|dmax/ms 0.1303
+v717|15|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|19|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|5942|-1|-1|-1|10|sim|reage 4030|prox 9.000--1.000|dmax/ms 0.0059
+v717|17|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1019
+v717|12|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.755-0.777|dmax/ms 0.1029
+v717|13|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|3|0|482|8483|-1|-1|35|sim|reage 380|prox 0.728-0.826|dmax/ms 0.0982
+v717|20|5|Aproximacao lenta 120->40 cm em 5 s|1|0|2|0|6062|-1|-1|-1|12|sim|reage 3970|prox 9.000--1.000|dmax/ms 0.0072
+v717|16|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|16|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.976-0.981|dmax/ms 0.1310
+v717|18|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.1015
+v717|7|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.707|dmax/ms 0.0938
+v717|14|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|37|sim|reage 140|prox 0.727-0.817|dmax/ms 0.1023
+v717|13|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|302|8303|-1|-1|1|sim|reage 200|prox 0.756-0.776|dmax/ms 0.1006
+v717|14|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.754-0.774|dmax/ms 0.1016
+v717|19|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.0977
+v717|17|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.974-0.981|dmax/ms 0.1305
+v717|17|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|15|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|34|sim|reage 140|prox 0.503-0.828|dmax/ms 0.1032
+v717|20|6|Pessoa sai aos 10 s|2|0|3|0|242|8243|-1|10922|1|nao|reage 140|prox 9.000--1.000|dmax/ms 0.0987
+v717|18|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.973-0.983|dmax/ms 0.1303
+v717|15|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.753-0.777|dmax/ms 0.1019
+v717|18|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|8|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0935
+v717|16|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|302|8303|-1|-1|39|sim|reage 200|prox 0.727-0.819|dmax/ms 0.0954
+v717|16|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.752-0.775|dmax/ms 0.1042
+v717|19|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.975-0.982|dmax/ms 0.1288
+v717|19|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1330
+v717|20|7|Muito perto, ~10 cm (20 s)|1|1|3|1|242|8243|122|-1|2|sim|reage 140|prox 0.999-1.000|dmax/ms 0.1331
+v717|20|3|Pessoa a 20 cm (20 s)|1|1|3|0|242|8243|122|-1|2|sim|reage 140|prox 0.974-0.982|dmax/ms 0.1292
+v717|17|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|38|sim|reage 140|prox 0.698-0.828|dmax/ms 0.1051
+v717|17|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.749-0.775|dmax/ms 0.1025
+v717|9|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0933
+v717|18|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|44|sim|reage 140|prox 0.729-0.837|dmax/ms 0.1038
+v717|18|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.755-0.782|dmax/ms 0.1021
+v717|19|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|242|8243|-1|-1|35|sim|reage 140|prox 0.700-0.839|dmax/ms 0.0908
+v717|19|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.750-0.781|dmax/ms 0.0983
+v717|10|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0920
+v717|20|8|Roupa macia a 45 cm: ruido 4 cm, 15% falhas|1|0|2|0|302|8303|-1|-1|31|sim|reage 200|prox 0.715-0.827|dmax/ms 0.0957
+v717|20|1|Pessoa parada a 45 cm (30 s)|1|0|2|0|242|8243|-1|-1|1|sim|reage 140|prox 0.755-0.777|dmax/ms 0.0993
+v717|11|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0927
+v717|12|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0937
+v717|13|2|Parede a 50 cm (70 s)|2|0|3|0|302|8303|-1|45302|1|nao|reage 200|prox 0.000-0.706|dmax/ms 0.0929
+v717|14|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0933
+v717|15|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.704|dmax/ms 0.0933
+v717|16|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0942
+v717|17|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.706|dmax/ms 0.0936
+v717|18|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.707|dmax/ms 0.0934
+v717|19|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.707|dmax/ms 0.0921
+v717|20|2|Parede a 50 cm (70 s)|2|0|3|0|242|8243|-1|45242|1|nao|reage 140|prox 0.000-0.705|dmax/ms 0.0924
