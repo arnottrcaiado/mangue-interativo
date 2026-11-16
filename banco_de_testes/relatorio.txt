@@ -68,7 +68,7 @@
   [OK ] Erro novo -> painel abre sozinho, icone culpado vermelho e os outros atenuados
   [OK ] Painel automatico fecha sozinho (5 s)
   [OK ] Erro persistente: painel relembrado quando alguem interage (>60 s)
-  anel aos 2,9 s: 15 de 28 pixels
+  anel aos 2,9 s: 14 de 28 pixels
   [OK ] Segurar o BOOT -> anel de progresso enche na moldura (metade aos 2,9 s)
   [OK ] Largar antes dos 5 s cancela (nada acontece)
   [OK ] Segurar 5 s -> abre portal Wi-Fi (servidor liberta a porta 80, timeout 3 min)
@@ -83,7 +83,7 @@
   [OK ] Giro animado suave termina exatamente em 90 graus
   [OK ] LEDs fisicos = vista rodada 90 graus (permutacao exata, boca do lado do chao)
   [OK ] Nova posicao vira o novo repouso (olhar centrado, sono possivel)
-  olhar com rosto a 90 graus: pupila (0.57, -0.05)
+  olhar com rosto a 90 graus: pupila (0.66, -0.11)
   [OK ] Olhar segue a gravidade no referencial do rosto rodado
   [OK ] A 12 graus do lado: mantem (dentro da janela)
   [OK ] A 40 graus (entre janelas): mantem a ultima orientacao (histerese)
@@ -146,6 +146,39 @@
   [OK ] RAM RTC com lixo (ligar a frio) e tratada com seguranca
   [OK ] API/pagina mostram o motivo do ultimo reinicio e o modulo
   [OK ] API mostra a pilha livre minima medida
+  [OK ] Arvore do logotipo 8x8: 40 LEDs, verde dominante em todos
+  [OK ] GET /api/imagem devolve 64 pixels RRGGBB
+  [OK ] Mostrar -> a matriz mostra a arvore (mesmos 40 LEDs) em verde
+  seiva na raiz: verde 6..8, maior salto entre frames 1 nivel(is)
+  [OK ] Imagem tem movimento suave (seiva), sem saltos bruscos
+  [OK ] Mostrar termina sozinho aos 15 s e volta ao rosto
+  [OK ] Manter: continua na tela depois de 15 s
+  [OK ] Voltar ao rosto: imagem sai com transicao suave
+  [OK ] Acao invalida -> 400
+  [OK ] Protetor invalido -> 400
+  [OK ] Com a placa rodada, a imagem roda junto (arvore direita)
+  [OK ] Protetor ativo para o teste da sequencia
+  sequencia do protetor: mare logo vida logo vagalumes logo mare
+  [OK ] Protetor: mare -> imagem -> vida -> imagem -> vaga-lumes -> imagem -> ...
+  [OK ] No protetor, a imagem aparece com a mesma forma
+  [OK ] Desmarcar 'no protetor' (guardado)
+  [OK ] Sem a opcao, o protetor so mostra as animacoes
+  [OK ] Estado da imagem na API
+  [OK ] Pousar a placa: inclinada+imovel 5 s vira o novo repouso
+  [OK ] Depois de pousada, a planta volta a conseguir dormir
+  [OK ] Fixar humor 'amor' -> rosto fica em amor (guardado)
+  [OK ] Humor fixo mantem-se sem interacao (nao volta a 'espera')
+  [OK ] Botoes de 10 s continuam a funcionar por cima do humor fixo
+  [OK ] Depois dos 10 s volta ao humor fixo (nao ao automatico)
+  [OK ] Com reacoes: sacudir ainda assusta
+  [OK ] Reage e volta ao humor fixo
+  [OK ] Desligar reacoes (guardado)
+  [OK ] Sem reacoes: sacudir nao tira do humor fixo
+  [OK ] Humor desconhecido -> 400
+  [OK ] Reacoes invalido -> 400
+  [OK ] Estado do humor na API
+  automatico: emocao 'sono' (energia 8, pessoa 0, sede 0)
+  [OK ] Automatico: volta a seguir sensores e energia
   [OK ] API rejeita emocao desconhecida (400)
   [OK ] API rejeita brilho fora de 5-100
   [OK ] Brilho 25% aplicado e guardado na flash
@@ -157,15 +190,15 @@
   paletas: par mais parecido dE=0.085, mais perto de ERRO/TENTANDO dE=0.110
   [OK ] Todas as paletas: emocoes distinguiveis e longe das cores de hardware
   [OK ] Paleta oceano aplicada e guardada
-  cromaticidade nos LEDs vs paleta oceano/alegria: erro 0.001
+  cromaticidade nos LEDs vs paleta oceano/alegria: erro 0.005
   [OK ] LEDs mostram a cor da nova paleta
   [OK ] /api/matriz devolve 64 pixels RRGGBB
   [OK ] Espelho da pagina = valores reais enviados aos LEDs
   [OK ] Solo desligado -> 'nao instalado', nivel geral continua OK (nao e erro)
   [OK ] Solo religado -> detetado de novo
-  ordem GRB (V7.4): espelho #000D0A -> LED fisico #0D000A
+  ordem GRB (V7.4): espelho #000E0B -> LED fisico #0E000B
   [OK ] Reproduz o defeito: com GRB o LED fisico troca vermelho e verde
-  ordem RGB (V7.5): espelho #000D0A -> LED fisico #000D0A
+  ordem RGB (V7.5): espelho #000E0C -> LED fisico #000E0C
   [OK ] Com RGB o LED fisico mostra a mesma cor que o espelho
   [OK ] Explica o sintoma: vermelho de ERRO enviado em GRB acende VERDE numa matriz RGB
   [OK ] Botao 'Testar cores' mostra vermelho, verde e azul puros

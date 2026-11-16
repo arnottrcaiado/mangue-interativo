@@ -2,12 +2,14 @@
 
 **Uma planta física com rosto, humor e respiração**, construída sobre a placa **Waveshare ESP32-S3-Matrix**. Ela reage ao movimento, à aproximação de pessoas e à umidade do solo; expressa emoções numa matriz de LED 8×8; e oferece uma página web para acompanhar e personalizar tudo — sem um único `delay()`.
 
-> Versão do firmware: **7.11 "Organismo Sereno"** · Plataforma: Arduino (arduino-esp32 2.x/3.x) · Idioma do código: português
+> Versão do firmware: **7.17 "Organismo Sereno"** · Plataforma: Arduino (arduino-esp32 2.x/3.x) · Idioma do código: português
 
 | | |
 |---|---|
 | ![Expressões](preview/rostos.png) | ![Painel de estado](preview/painel_estado.png) |
 | *As 9 expressões (frames reais do motor visual)* | *Painel de estado na própria placa* |
+| ![DuMangue 8x8](preview/dumangue_8x8.png) | ![Imagem na placa](preview/imagem_placa.png) |
+| *Logótipo DuMangue → árvore 8×8* | *A imagem na placa (e rodada com ela)* |
 | ![Rotação](preview/rotacao.png) | ![Girar e fixar](preview/girar_fixar.png) |
 | *Rotação automática: o que os LEDs mostram com a placa a 90°, 180°, 270° e 0°* | *Girar e fixar pelo botão BOOT* |
 
@@ -46,11 +48,13 @@ O projeto tem três objetivos:
 - **Robusto** — multitarefa real (tudo com `millis()`), recuperação automática de falhas de sensores e de rede.
 - **Usável** — sinalização de sistema separada das emoções, diagnóstico na própria placa e na web, decisões baseadas em medições.
 
+---
+
 ### Estrutura do repositório
 
 | Caminho | Conteúdo |
 |---|---|
-| `Mangue_Interativo_V7_11/Mangue_Interativo_V7_11.ino` | Firmware completo (arquivo único) — é este que se grava na placa |
+| `Mangue_Interativo_V7/Mangue_Interativo_V7.ino` | Firmware completo (arquivo único) — é este que se grava na placa |
 | `banco_de_testes/` | Compila o firmware no PC com *stubs* e verifica o comportamento (ver [seção 11](#11-banco-de-testes)) |
 | `preview/` | Imagens e animações geradas pelo próprio motor visual |
 | `PROMPT.md` | Prompt que descreve o projeto final, para reproduzir ou estender com IA |
@@ -79,11 +83,14 @@ As transições entre rostos e cores são **suaves** (crossfade de 900 ms; cor i
 
 ### 2.2 Vida e movimento
 - **Respiração por tamanho** — o rosto cresce e encolhe (reamostragem por área, subpixel) com brilho praticamente constante. Nada pisca.
-- **Olhar com física** — pupilas com mola-amortecedor ("olhos de boneco"): rolam para o lado mais baixo ao inclinar a placa; olham em frente para quem está perto; ficam vesgas a < 12 cm; sem estímulo, fazem sacadas calmas (a cada 3–7 s).
+- **Olhar com física** — pupilas com mola-amortecedor ("olhos de boneco"): rolam para o lado mais baixo ao inclinar a placa; viram-se para quem se aproxima (a partir de ~1 m) e ficam vesgas aos poucos entre 25 e 10 cm; o rosto fica maior, mais brilhante e respira mais depressa à medida que a pessoa se aproxima; sem estímulo, fazem sacadas calmas (a cada 3–7 s).
 - **Energia (0–100)** — cai com o tempo e com sede, sobe com interação e repouso; modula humor, ritmo respiratório e brilho.
 - **Rotação automática** — com a placa de pé, o rosto (e também painel, indicador e avisos) gira 90°/180°/270° para ficar sempre direito quando um dos lados está a **menos de 15° do horizonte**. O giro é animado; entre as janelas de 15° a orientação se mantém (sem oscilar); é preciso ficar 0,4 s na nova posição; com a placa deitada nada muda. O olhar e a posição de repouso acompanham a nova orientação.
 - **Girar ↺↻ e fixar 🔒** — manipulação direta, como o bloqueio de rotação do celular: se o rosto ficar torto, segure a placa direita e toque em girar até ficar direito — em modo automático a planta **aprende** a correção do sensor e continua a girar sozinha e certa; em modo **fixo**, o rosto fica na posição escolhida. Disponível na página e no botão BOOT (duplo toque).
-- **Despertar e adormecer** — pálpebras abrem ao ligar; após 90 s sem interação, a planta adormece e entra o **protetor de tela** (Maré, Jogo da Vida, Vaga-lumes).
+- **Despertar e adormecer** — pálpebras abrem ao ligar; após 90 s sem interação, a planta adormece e entra o **protetor de tela**: Maré → **árvore DuMangue** → Jogo da Vida → **árvore** → Vaga-lumes → **árvore** (as animações alternam com a imagem; pode desligar a imagem no protetor).
+- **Imagem DuMangue** — a árvore do logótipo em 8×8: **silhueta medida** no próprio logo (copa larga e arredondada, tronco comprido, raízes a abrir), **folhas à esquerda** e **circuito com pads à direita**, tronco entrelaçado; o brilho de cada LED segue a densidade do desenho original. Medido contra o logo: **95%** de sobreposição de silhueta e correlação **0,78**. Uma "seiva" de luz sobe das raízes à copa, devagar (±18%, sem piscar). Na página: **Mostrar (15 s)**, **Manter na tela**, **Voltar ao rosto**.
+- **Humor de base fixo** — na página, escolha o humor em que a planta **fica** (guardado), separado dos botões de 10 s. Opção de **continuar a reagir** (susto, alívio) e voltar ao humor fixo.
+- **Nova posição de repouso** — se a placa ficar inclinada e imóvel 5 s (ex.: pousada na mesa depois de estar de pé), essa passa a ser a posição de repouso: o olhar volta ao centro e a planta volta a poder dormir.
 
 ### 2.3 Sinalização de sistema (3 camadas, separada das emoções)
 | Camada | Onde | Diz | Quando |
@@ -186,7 +193,7 @@ HC-SR04                ESP32-S3-Matrix
    - **WiFiManager** (tzapu), **≥ 2.0** — necessária para `getConfigPortalActive()` e o modo não bloqueante.
    - `WebServer`, `ESPmDNS`, `Preferences`, `Wire` já vêm com o core ESP32.
 3. **Placa**: *ESP32S3 Dev Module* · **USB CDC On Boot: Enabled** (para o Monitor Serial pela USB nativa) · *Flash Size* conforme o seu módulo (a ESP32-S3-Matrix usa 4 MB).
-4. Abra `Mangue_Interativo_V7_11/Mangue_Interativo_V7_11.ino` e grave. (A Arduino IDE exige que o `.ino` fique numa pasta com o mesmo nome; por isso a pasta e o arquivo levam a versão.)
+4. Abra `Mangue_Interativo_V7/Mangue_Interativo_V7.ino` e grave. (A Arduino IDE exige que o `.ino` fique numa pasta com o mesmo nome. O nome é fixo; a versão está no cabeçalho do arquivo, no histórico abaixo e nas *tags* do Git, para o histórico de cada arquivo não se partir a cada versão.)
 5. Monitor Serial a **115200** baud para ver o diagnóstico (`[IMU]`, `[SAUDE]`, `[REDE]`, `[ESTADO]`…).
 
 > Se a gravação falhar: segure **BOOT**, pressione **RESET**, solte **BOOT** e grave de novo.
@@ -262,6 +269,9 @@ Inclinar (o olhar segue) · pôr de lado ou de cabeça para baixo (o rosto gira)
 | POST | `/api/rotacao` | `auto` (`1`/`0`) | Automática / fixa na posição atual (salva) |
 | POST | `/api/girar` | `sentido` (`1` = ↻, `-1` = ↺) | Gira o rosto 90° (aprende a correção se automática) |
 | POST | `/api/orientacao` | `passo` (`1`, `2`, `repor`) | Calibração completa da montagem do sensor |
+| POST | `/api/humor` | `nome` (emoção ou `auto`), `reacoes` (`1`/`0`) | Humor de base permanente (salvo) |
+| GET | `/api/imagem` | — | Imagem DuMangue 8×8 (`RRGGBB`×64) |
+| POST | `/api/imagem` | `acao` (`mostrar`, `manter`, `parar`) ou `protetor` (`1`/`0`) | Mostrar a imagem / incluí-la no protetor |
 | POST | `/api/acordar` | — | Acorda a planta |
 | POST | `/api/protetor` | — | Força o protetor de tela |
 | POST | `/api/calibrar` | — | Recalibra a posição de repouso |
@@ -340,12 +350,61 @@ Cada decisão abaixo foi motivada por um problema **medido** ou **documentado**:
 | Ordem de cor RGB | A matriz desta placa é declarada `RGB` (ESPHome) e testes públicos usam `NEO_RGB` no GPIO14; com GRB, vermelho e verde saíam trocados. |
 | Servidor web só depois do portal | O portal do WiFiManager usa a porta 80; dois servidores na mesma porta entram em conflito. |
 | HC-SR04 por interrupção | `pulseIn()` bloqueia (até 1 s por padrão). |
+| Leituras do HC-SR04 em 6 camadas (v7.15) | Ver a seção 10.1: na v7.14 a mediana misturava falhas de eco com distâncias e cada leitura decidia sozinha; com ruído realista a presença trocava 9–31 vezes em 30 s com a pessoa parada. |
 | Solo no GPIO4 (ADC1) | O ADC2 do ESP32 é compartilhado com o Wi-Fi. |
 | Sinalização de sistema separada do rosto | Na V7.4 um sensor ausente pintava o rosto de vermelho e parecia "paleta quebrada". Princípios aplicados: um canal = um significado; não usar só cor (WCAG 1.4.1); ausente ≠ erro; *debounce*; tecnologia calma (Weiser & Brown); diagnóstico e recuperação (Nielsen #9). |
 | Rotação com janela de 15°, 0,4 s de estabilidade e "manter entre janelas" | Evita o rosto oscilar perto de 45°; medido: o giro começa ~0,52 s após virar a placa e anda no máximo 3°/frame; girar à mão (90° em 0,4 s) gera 0,28 g de agitação — abaixo do limiar de susto (0,8 g). |
 | Correção de montagem do sensor +90° | Teste na placa real: sem correção o rosto ficava sempre 90° anti-horário; um exemplo público para esta placa também troca X/Y do QMI8658. Simulado e corrigido (o banco de testes reproduz o defeito). |
 | Girar/fixar por manipulação direta + calibração de 2 passos | Uma rotação produz erro constante (corrigível com um toque); um espelho produz erro que alterna de sentido (180°/0°) e só é detectável com 2 posições. |
+| Imagem DuMangue: silhueta medida + materiais desenhados + brilho pela densidade | Redução automática pura: fiel em manchas mas sem "materiais". Pixel art livre (v7.13): estilizada demais — só 42% de sobreposição com a silhueta do logo (r 0,09). Versão final: silhueta medida (95%), folhas/circuito/tronco desenhados, brilho modulado pela densidade (r 0,62 → 0,78); a variante com r 0,82 apagava os pads do circuito e foi descartada. |
+| Humor fixo separado dos botões de 10 s | Dois modelos mentais (temporário vs permanente) em controles distintos e rotulados; a opção "continuar a reagir" fica desativada quando não se aplica. |
 | Botão BOOT como entrada | O BOOT é o GPIO0 e pode ser lido após o boot (HIGH solto, LOW pressionado). |
+
+### 10.1 Sensor de distância: como as leituras são tratadas (v7.15)
+
+O HC-SR04 real oscila (±1–4 cm), às vezes não devolve eco (superfícies macias ou inclinadas) e às vezes devolve ecos espúrios (lóbulos laterais, ecos cruzados). Na v7.14 cada leitura decidia diretamente a presença, o "susto" e as interações, por isso as reações ficavam instáveis. Agora:
+
+1. **Validação física**: só valem 2–400 cm (gama do datasheet). Uma falha de eco é **ignorada**; só depois de 4 seguidas (~0,3 s) se declara "nada à frente".
+2. **Saltos impossíveis** (mais de 20 cm, ou mais de 350 cm/s) e **algo que surge do "nada"** só são aceites se as **2 leituras seguintes** concordarem (±12 cm mais a folga do movimento real). Assim os ecos espúrios são descartados, e uma mão que aparece de verdade é aceite em cerca de 120 ms.
+3. **Mediana de 3** (só leituras válidas) + **filtro 1€** (Casiez, Roussel & Vogel, CHI 2012; corte mínimo 1,5 Hz, β 0,06). Suaviza muito quando parado e quase não atrasa quando há movimento rápido. Faz 16 leituras/s (ciclo de 60 ms, o mínimo do fabricante).
+4. **Presença confirmada no tempo**: entra < 60 cm durante 0,12 s e sai > 75 cm durante 0,7 s.
+5. **Pessoa ou parede**: decide pela amplitude da distância filtrada numa janela de 3 s (> 2,5 cm). Antes era a diferença entre leituras cruas (> 1 cm), que o próprio ruído ultrapassava.
+6. **Susto** quando algo se aproxima mais de 25 cm em 400 ms e fica a menos de 30 cm durante **2 leituras validadas seguidas**, ou quando surge (confirmado) já a menos de 30 cm. Este critério usa só leituras aceites e não depende do filtro, que recomeça nos saltos. **Interação** quando a velocidade filtrada passa de 20 cm/s.
+7. **Proximidade contínua (v7.17)**: um valor de 0 a 1 (0 a partir de 120 cm, 1 a 10 cm ou menos), atualizado a cada quadro (100/s, entre as 16 leituras/s do sensor). Sobe depressa (τ 70 ms) e desce devagar (τ 450 ms). Comanda, sem limiares:
+   - o **olhar**, que se vira para a pessoa logo que a proximidade passa de 0,08 (cerca de 105 cm), antes de haver "presença";
+   - a **convergência** (vesgo), que cresce de forma contínua entre 25 e 10 cm;
+   - a **respiração**: contida até 65%, o que deixa o rosto maior e mais firme;
+   - o **ritmo**, até +45%;
+   - o **brilho**, até +20%;
+   - um **sobressalto** no olhar (impulso na mola da pupila) quando a aproximação passa de 45 cm/s.
+   As emoções (CURIOSO, AMOR) continuam a mudar com transições suaves.
+
+**Medição** (`banco_de_testes/ultrassom.cpp`, mesmo ruído para as duas versões: σ 1,2 cm, 6% sem eco, 3% ecos espúrios):
+
+| Cenário | Métrica | v7.14 | v7.15 |
+|---|---|---|---|
+| Pessoa parada a 45 cm, 30 s | trocas de presença / de emoção | 9 / 10 | **1 / 2** |
+| | AMOR após (deveria ser ~8 s) | 26,5 s | **8,2 s** |
+| Parede a 50 cm, 70 s | ignorada como mobília? | não (9 trocas) | **sim, aos 45 s** |
+| Pessoa a ~10 cm, 20 s | olhar vesgo a ligar/desligar | 27 vezes | **1** |
+| Roupa macia (σ 4 cm, 15% sem eco), 30 s | trocas de presença / de emoção | 31 / 31 | **1 / 2** |
+| Aproximação rápida 120→15 cm em 0,5 s | susto | sim | **sim** (mesmo instante) |
+| Aproximação lenta 120→40 cm em 5 s | falso susto / trocas de presença | 0 / 5 | **0 / 1** |
+| Entrada / saída de presença | atraso | — | **+0,28 s / +0,9 s** |
+
+**v7.17, com 20 sementes de ruído por cenário** (`ultrassom.cpp <cenário> <semente>`):
+
+| Cenário | Métrica | v7.16 | v7.17 |
+|---|---|---|---|
+| Cenários sem susto real (1, 2, 5, 6, 8) | sustos falsos | 9 em 100 | **0 em 100** |
+| Aproximação rápida 120→15 cm | susto detetado / mediana | 20/20, 0,19 s após chegar | **20/20, 0,26 s** |
+| Surge já a 20 cm | susto | 20/20 em 32 ms | **20/20 em 122 ms** (confirmação) |
+| Pessoa aparece a 45 cm | 1.ª reação visível | 242 ms (presença) | **140 ms** (olhar) |
+| Aproximação lenta 120→40 cm | 1.ª reação visível | 4,2 s após começar | **1,9 s** |
+| Pessoa parada a 45 cm | variação da proximidade | — | 0,756–0,773 (1,7%) |
+| Roupa macia (ruído 4 cm) | variação da proximidade | — | 0,72–0,82 |
+
+O custo da robustez são 70 a 90 ms a mais até ao susto, porque cada salto precisa de duas leituras de confirmação. O ganho é que nenhum par de ecos espúrios dispara reações. A presença demora mais 0,12 s a ser confirmada e o "foi-se embora" mais 0,9 s. Isto foi escolhido de propósito para que as falhas de eco breves não "apaguem" a pessoa. Se quiser outro equilíbrio, ajuste `US_PERTO_ENTRA_MS`, `US_PERTO_SAI_MS` e `US_FALHAS_PARA_NADA`. A página mostra "leitura instável" quando menos de 80% das leituras são válidas, e `/api/estado` inclui `us.bruto`, `us.qualidade` (%), `us.vel` (cm/s) e `us.prox` para diagnóstico.
 
 ---
 
@@ -355,14 +414,16 @@ A pasta `banco_de_testes/` compila **o `.ino` real** no PC com *stubs* do Arduin
 
 ```bash
 cd banco_de_testes
-g++ -std=gnu++17 -O2 -Istubs -x c++ teste.cpp -o teste && ./teste out     # 145 verificações
-g++ -std=gnu++17 -O2 -Istubs -DINO='"../Mangue_Interativo_V7_11/Mangue_Interativo_V7_11.ino"' \
+g++ -std=gnu++17 -O2 -Istubs -x c++ teste.cpp -o teste && ./teste out     # 175 verificações
+g++ -std=gnu++17 -O2 -Istubs -DINO='"../Mangue_Interativo_V7/Mangue_Interativo_V7.ino"' \
     -x c++ metrica.cpp -o metrica && ./metrica                              # métricas de "piscar"
+g++ -std=gnu++17 -O2 -Istubs -DINO='"../Mangue_Interativo_V7/Mangue_Interativo_V7.ino"' \
+    -DTEM_PROX -x c++ ultrassom.cpp -o ultrassom && for c in 1 2 3 4 5 6 7 8; do ./ultrassom $c 1; done   # ruído do HC-SR04 (cenário, semente)
 python3 render.py out/frames.txt out                                       # PNG/GIF (Pillow)
 # Página: pagina_web/servidor.py + testar_pagina.js (Chrome real, npm i puppeteer-core)
 ```
 
-Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da página no Chrome. O banco de testes não mede a pilha do ESP32; o consumo por função foi medido com `-fstack-usage` (ex.: `renderizarFrame` 1 696 B → 160 B).
+Resultado da versão 7.17: **179/179** verificações do firmware e **31/31** da página no Chrome. O banco de testes não mede a pilha do ESP32; o consumo por função foi medido com `-fstack-usage` (ex.: `renderizarFrame` 1 696 B → 160 B).
 
 > O banco de testes valida lógica, motor visual e página. **Não substitui** compilar no arduino-esp32 nem testar na placa.
 
@@ -372,6 +433,8 @@ Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da
 
 | Sintoma | Causa provável | O que fazer |
 |---|---|---|
+| "Testar cores" acende só parte da matriz (ex.: a metade do lado do USB-C) | A fila de dados dos WS2812B está interrompida: cada LED repassa os dados ao seguinte, por isso uma solda fria ou um LED danificado apaga ou estraga todos os que vêm depois | Reaquecer com fluxo os pads do último LED que acende e do primeiro que falha (resolveu o caso real da v7.16). Se não resolver, trocar esse LED. |
+| Rosto com cores misturadas pixel a pixel e fundo com pontos coloridos fracos | Dados corrompidos a caminho dos LEDs (sinal/alimentação), não um desenho do firmware | Desligue o fio ECHO do HC-SR04: se ficar limpo, é a ligação do sensor (divisor 1k/2k, GND comum, mau contacto). Veja `eco N/s` no Serial (normal ~29) e `[US] RUIDO no ECHO`. |
 | Monitor Serial repete `rst:0xc (RTC_SW_CPU_RST)` sem parar | Crash em ciclo (ex.: pilha esgotada) | Use a v7.11+. Após o reinício, procure a linha `[DIAG] ultimo reinicio: … durante '<módulo>'` (repete-se no 1.º minuto) e o campo "último reinício" no rodapé da página. |
 | `[DIAG] … QUEDA DE TENSAO (brownout)` | Alimentação fraca (cabo/porta USB) | Outro cabo/porta; reduza o brilho. |
 | Monitor mostra "não está conectado" após reinício | A USB nativa reconecta a cada reset | Reabra o monitor; a mensagem `[DIAG]` repete-se a cada 5 s no 1.º minuto. |
@@ -421,11 +484,18 @@ Resultado da versão 7.11: **145/145** verificações do firmware e **22/22** da
 | 7.9 | Correção da montagem do acelerômetro (+90°) e calibração completa em 2 passos (rotação ou espelho) |
 | 7.10 | Girar ↺↻ e fixar 🔒 na página e no BOOT (duplo toque = modo girar) |
 | 7.11 | **Correção do reinício em ciclo** (pilha: `show()` da NeoPixel ~6 KB); pilha de 16 KB, buffers estáticos; diagnóstico de reinícios (motivo + módulo) e pilha livre |
+| 7.12 | Imagem DuMangue (logótipo em 8×8) na página e no protetor, alternando com as animações |
+| 7.13 | Imagem redesenhada como árvore de circuitos; humor de base fixo; nova posição de repouso ao pousar a placa |
+| 7.14 | Imagem DuMangue mais fiel ao logótipo (silhueta medida 95%, correlação 0,78) |
+| 7.15 | Sensor de distância robusto: falhas ignoradas, saltos confirmados, filtro 1€, presença confirmada no tempo, reações pela velocidade (seção 10.1) |
+| 7.16 | Vigilância elétrica do ECHO: conta bordas/s e pausa a interrupção 5 s se houver rajada (> 300/s), com aviso no Serial e na página |
+| 7.17 | Reação imediata e contínua à distância: proximidade 0–1 a 100 FPS (olhar, convergência, tamanho, brilho, ritmo, sobressalto); 16 leituras/s; susto por aproximação validada (0 falsos em 100 execuções) |
 
 ---
 
 ## 16. Autoria, créditos e licença
 
+- **Logótipo DuMangue:** propriedade dos autores do projeto; a versão 8×8 é uma adaptação para a matriz de LEDs.
 - **Autoria e concepção:** professores Arnott Ramos Caiado e Samantha Pimentel; estudantes Jamile Keiller e Júlia Cássia — Faculdade Senac PE.
 - **Projeto:** Mangue Interativo, desenvolvido ao longo da jornada [IoT & Maker RoadMap 2026/2](https://tutorpesquisa.pythonanywhere.com/iotmaker2026).
 - **Desenvolvimento assistido por IA:** Claude (Anthropic) — ver [seção 17](#17-notas-sobre-o-uso-de-ia-generativa-iag).
@@ -445,16 +515,18 @@ Este projeto foi desenvolvido com **assistência de Inteligência Artificial Gen
 - Concebeu o projeto, o conceito da planta expressiva e a arquitetura-base (V6.0).
 - Definiu requisitos e direção a cada iteração (ex.: "está piscando muito", "brilho incomoda", "a paleta não aparece nos LEDs", "pense com princípios de UX").
 - Observou o comportamento real na placa e reportou problemas — sem isso, defeitos como a **ordem de cor dos LEDs** e a **montagem rodada do acelerômetro** e o **reinício em ciclo por falta de pilha** não teriam sido encontrados — limitações de um banco de testes no PC que a placa real revelou.
-- Propôs funcionalidades e ideias de interação (ex.: rotação automática; girar e fixar).
+- Propôs funcionalidades e ideias de interação (ex.: rotação automática; girar e fixar; imagem DuMangue; humor fixo; reação contínua à distância).
+- Diagnosticou na placa, com o teste de cores, uma **solda fria** que cortava a fila de LEDs a meio, e corrigiu-a reaquecendo; o firmware não tinha culpa, mas só o teste físico o podia mostrar.
 - Tomou as decisões finais e é responsável pelo uso do resultado.
 
 **O que a IA fez**
-- Gerou e refatorou o código do firmware (V7.0–V7.11), a página web, a API e esta documentação.
+- Gerou e refatorou o código do firmware (V7.0–V7.17), converteu/redesenhou o logótipo DuMangue em 8×8, e fez a página web, a API e esta documentação.
 - Propôs decisões de design de UX/UI com justificativa e pesquisou documentação técnica (datasheets, bibliotecas, pinout).
 - Construiu um banco de testes que compila o firmware no PC, mediu métricas (luminância, ΔE de cor, continuidade de fase) e gerou as pré-visualizações a partir do próprio motor visual.
 
 **Como o resultado foi verificado**
-- 145 verificações automáticas do firmware e 22 da página num navegador Chrome real.
+- 179 verificações automáticas do firmware e 31 da página num navegador Chrome real.
+- Cenários de ruído do sensor de distância com 20 sementes por cenário, comparando versões (seção 10.1).
 - Métricas comparativas entre versões (seção 10) e imagens geradas pelo código real.
 - Fontes técnicas citadas na seção 18.
 

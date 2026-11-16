@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  *  PROJETO : Mangue Interativo — Cérebro ESP32-S3 Matrix
- *  VERSÃO  : 7.11 "Organismo Sereno"  (evolução da V7.1 / V7.0 / V6.0)
+ *  VERSÃO  : 7.17 "Organismo Sereno"  (evolução da V7.1 / V7.0 / V6.0)
  *  PLACA   : Waveshare ESP32-S3-Matrix
  *            - Matriz WS2812B 8x8 ........ GPIO14
  *            - IMU QMI8658 (I2C) ......... SDA GPIO11 / SCL GPIO12, end. 0x6B
@@ -46,10 +46,21 @@
  *   - CORREÇÃO DO REINÍCIO EM CICLO (rst:0xc): show() da NeoPixel usa ~6 KB
  *     de pilha; agora corre a partir do loop(), com buffers estáticos e pilha
  *     de 16 KB. Diagnóstico de reinícios (motivo + módulo) e pilha livre.
+ *   - IMAGEM DUMANGUE: a árvore do logótipo em 8x8 (silhueta medida, folhas à
+ *     esquerda, circuito à direita, tronco entrelaçado, "seiva" a subir): na
+ *     página (mostrar 15 s / manter) e no protetor, alternando com as animações.
+ *   - HUMOR DE BASE FIXO na página (guardado), com opção de continuar a reagir.
+ *   - SENSOR DE DISTÂNCIA robusto: validação física, falhas de eco ignoradas,
+ *     saltos confirmados, mediana + filtro 1€, presença confirmada no tempo,
+ *     pessoa vs parede por amplitude, reações pela velocidade filtrada.
+ *   - PROXIMIDADE CONTÍNUA (0..1) a 100 FPS: olhar, convergência, tamanho,
+ *     brilho e ritmo acompanham a distância sem limiares; aproximação rápida
+ *     dá um sobressalto no olhar. Emoções continuam suaves.
  *   - ENERGIA interna (0-100): cai com o tempo e com sede, sobe com interação
  *     e repouso. Influencia humor, ritmo respiratório, brilho e piscar.
  *   - Despertar ao ligar (pálpebras abrem), adormecer por inatividade e
- *     PROTETOR DE ECRÃ animado (Maré, Jogo da Vida, Vaga-lumes), lento e suave.
+ *     PROTETOR DE ECRÃ animado (Maré, Jogo da Vida, Vaga-lumes) alternando com
+ *     a imagem DuMangue, lento e suave.
  *   - Falhas (SEM piscar, canal próprio): indicador no canto da matriz
  *     (azul = a iniciar, âmbar = atenção, vermelho fixo = erro); Wi-Fi perdido
  *     -> CONFUSO 4 s + ícone Wi-Fi 1x (e de novo só quando alguém chega);
@@ -153,15 +164,51 @@ SET_LOOP_TASK_STACK_SIZE(16 * 1024);
 #define USAR_ULTRASSOM            1
 #define PINO_US_TRIG              5      // confirme no pinout os GPIO livres
 #define PINO_US_ECHO              6
-#define US_INTERVALO_MS          70      // fabricante: ciclo >= 60 ms
+#define US_INTERVALO_MS          60      // fabricante: ciclo >= 60 ms (16 leituras/s)
 #define US_INTERVALO_SONDA_MS  2000      // se ausente, sonda devagar
 #define US_TIMEOUT_MS            60
 #define US_FALHAS_AUSENTE        10
 #define US_PERTO_ENTRA_CM        60.0f
 #define US_PERTO_SAI_CM          75.0f
-#define US_VESGO_CM              12.0f
-#define US_VARIACAO_MIN_CM        1.0f   // pessoas mexem-se; paredes não
-#define US_OBJETO_ESTATICO_MS 45000      // sem variação -> é mobília, ignora
+#define US_OBJETO_ESTATICO_MS 45000      // sem atividade -> é mobília, ignora
+// --- Tratamento das leituras (ruído, falhas de eco, ecos espúrios)
+#define US_MIN_CM                 2.0f   // gama do HC-SR04 (datasheet: 2-400 cm)
+#define US_MAX_CM               400.0f
+#define US_FALHAS_PARA_NADA          4   // ~0,3 s sem leitura válida = "nada à frente"
+#define US_VEL_MAX_CM_S         350.0f   // mais rápido do que isto = salto suspeito (confirmar)
+#define US_SALTO_MIN_CM          20.0f
+#define US_CONFIRMA_SALTO_CM     12.0f   // as leituras seguintes têm de concordar
+#define US_CONFIRMACOES             2    // nº de leituras seguintes concordantes (2 x 60 ms)
+#define US_EURO_FREQ_MIN          1.5f   // filtro 1€: corte mínimo (Hz) — suaviza parado
+#define US_EURO_BETA             0.06f   // filtro 1€: quanto o corte sobe com a velocidade
+#define US_EURO_FREQ_DERIV        1.0f   // filtro 1€: corte da derivada (Hz)
+#define US_PERTO_ENTRA_MS         120    // presença: confirmar a entrada...
+#define US_PERTO_SAI_MS           700    // ...e a saída (falhas breves não "apagam" a pessoa)
+#define US_JANELA_ATIVIDADE_MS   3000    // pessoa vs parede: amplitude do movimento em 3 s
+#define US_ATIVIDADE_MIN_CM       2.5f
+#define US_SUSTO_APROX_CM        25.0f   // aproximação brusca: > 25 cm ...
+#define US_SUSTO_JANELA_MS        400    // ... em 400 ms ...
+#define US_SUSTO_DIST_CM         30.0f   // ... que termina perto
+#define US_VEL_INTERACAO_CM_S    20.0f   // movimento real à frente = interação
+// --- Proteção elétrica: o ECHO gera 2 bordas por medição (~29/s a 70 ms).
+//     Um fio solto / sem divisor / mau contacto pode gerar milhares por segundo,
+//     roubando CPU às interrupções que alimentam os LEDs. Acima do limite, a
+//     interrupção é desligada 5 s e o problema fica registado (Serial + página).
+#define US_BORDAS_MAX_S           300
+// --- PROXIMIDADE CONTÍNUA (0..1): reação imediata e proporcional, a 100 FPS.
+//     A emoção (CURIOSO, AMOR) continua discreta e suave; a proximidade mexe
+//     no olhar, tamanho, brilho e ritmo sem limiares nem saltos.
+#define PROX_LONGE_CM           120.0f   // a partir daqui começa a "reparar"
+#define PROX_PERTO_CM            10.0f   // proximidade máxima
+#define PROX_SOBE_MS             70.0f   // aproximar: responde depressa
+#define PROX_DESCE_MS           450.0f   // afastar: acalma devagar
+#define PROX_VESGO_INICIO_CM     25.0f   // convergência cresce de 25 -> 10 cm
+#define PROX_BRILHO_EXTRA        0.20f   // +20% de brilho ao máximo (conforto visual)
+#define PROX_RESPIRACAO_PRESA    0.65f   // perto: respiração mais contida (atento)
+#define PROX_RITMO_EXTRA         0.45f   // perto: respira até +45% mais depressa
+#define PROX_IMPULSO_VEL_CM_S    45.0f   // aproximação rápida: "sobressalto" no olhar
+#define PROX_IMPULSO_PAUSA_MS     700
+#define US_PAUSA_RUIDO_MS        5000
 
 // ---------- Humidade do solo (analógico)
 #define USAR_SENSOR_SOLO          1      // 0 se não estiver ligado (pino flutua!)
@@ -212,6 +259,10 @@ SET_LOOP_TASK_STACK_SIZE(16 * 1024);
 #define DURACAO_ADORMECER_MS   2200
 #define DURACAO_FADE_PROT_MS   1500
 #define DURACAO_CADA_PROT_MS  40000
+#define DURACAO_PROT_LOGO_MS  20000      // a imagem DuMangue fica menos tempo que as animações
+#define DURACAO_IMAGEM_MS     15000      // "Mostrar" na página: 15 s
+#define BRILHO_IMAGEM          0.22f     // igual ao rosto
+#define PERIODO_SEIVA_MS       3500      // "seiva" que sobe das raízes à copa (movimento suave)
 #define DURACAO_AVISO_MS       4000
 
 // ---------- Sinalização de SISTEMA (separada das emoções — ver secção 4b)
@@ -256,6 +307,7 @@ SET_LOOP_TASK_STACK_SIZE(16 * 1024);
 #define LIMIAR_INTERACAO_G      0.08f
 #define LIMIAR_SUSTO_G          0.80f
 #define AMOSTRAS_CALIBRACAO      50
+#define NOVO_REPOUSO_MS        5000      // "inclinada" mas imóvel 5 s = nova posição de repouso
 #define REFRATARIO_SUSTO_MS     800
 #define DURACAO_SUSTO_MS       3000
 #define SUSTOS_PARA_RAIVA         3
@@ -288,7 +340,7 @@ enum class Emocao : uint8_t {
 enum class StatusHardware : uint8_t { TENTANDO, SUCESSO, ERRO };
 enum class ModoEcra       : uint8_t { ACORDAR, ROSTO, ADORMECER, PROTETOR };
 enum class EstadoRede     : uint8_t { A_LIGAR, PORTAL, LIGADO, PERDIDO };
-enum class TipoProtetor   : uint8_t { MARE, VIDA, VAGALUMES, TOTAL };
+enum class TipoProtetor   : uint8_t { MARE, VIDA, VAGALUMES, LOGO, TOTAL };
 
 // ---- Saúde do sistema: UM modelo para todos os componentes -------------------
 // AUSENTE != ERRO: um sensor opcional não instalado não é uma avaria.
@@ -405,6 +457,40 @@ const uint8_t ICONE_WIFI[3][8] = {
   {0, 0b01111110, 0b10000001, 0, 0, 0, 0, 0},                       // arco grande
 };
 
+// ---- Imagem DuMangue: a árvore do logótipo em 8x8 ----------------------------
+// 1) SILHUETA medida no logótipo (cobertura dos traços por bloco de ~68 px):
+//    copa larga e arredondada, tronco estreito e comprido, raízes a abrir.
+// 2) MATERIAIS como no logo: folhas à esquerda (dois verdes, textura de
+//    folhagem), circuito à direita (trilhas + pads verde-menta nas pontas),
+//    tronco ENTRELAÇADO (trilhas claras/escuras alternadas) e raízes.
+// 3) BRILHO de cada LED modulado pela densidade real do desenho (piso 45%):
+//    bordas da copa mais ténues, como no original.
+//   . . l L T N . .      L/l = folha   N = pad   T/t = trilha (clara/escura)
+//   . L l L T T N .
+//   l L l L T N T N      Medido contra o logótipo: sobreposição da silhueta
+//   L l L l T T T N      95% e correlação 0,78 (versão anterior: 42% e 0,09).
+//   L l . l T . N T
+//   . . . T t . . .
+//   . . . t T . . .
+//   . . T t T T . .
+const uint8_t IMAGEM_DUMANGUE[NUM_LEDS][3] = {
+  {  0,  0,  0}, {  0,  0,  0}, { 19,120, 30}, { 35,203, 53}, { 19,142, 42}, {111,188,130}, {  0,  0,  0}, {  0,  0,  0},
+  {  0,  0,  0}, { 30,175, 45}, { 28,177, 44}, { 44,255, 67}, { 22,166, 50}, { 19,137, 41}, {105,180,123}, {  0,  0,  0},
+  { 16, 96, 24}, { 44,255, 67}, { 28,177, 44}, { 44,255, 67}, { 22,163, 49}, {142,241,165}, { 18,135, 41}, {100,171,116},
+  { 34,197, 51}, { 28,177, 44}, { 44,255, 67}, { 28,177, 44}, { 22,166, 50}, { 18,133, 40}, { 20,149, 44}, {119,201,137},
+  { 41,236, 62}, { 28,177, 44}, {  0,  0,  0}, { 23,151, 38}, { 22,166, 50}, {  0,  0,  0}, {128,216,149}, { 18,134, 40},
+  {  0,  0,  0}, {  0,  0,  0}, {  0,  0,  0}, { 17,128, 39}, { 11, 89, 28}, {  0,  0,  0}, {  0,  0,  0}, {  0,  0,  0},
+  {  0,  0,  0}, {  0,  0,  0}, {  0,  0,  0}, {  9, 75, 23}, { 22,166, 50}, {  0,  0,  0}, {  0,  0,  0}, {  0,  0,  0},
+  {  0,  0,  0}, {  0,  0,  0}, { 16,114, 34}, { 11, 89, 28}, { 22,166, 50}, { 20,151, 45}, {  0,  0,  0}, {  0,  0,  0},
+};
+struct EstadoImagem {
+  bool ativa = false;
+  bool manter = false;                     // true = fica até "Parar"
+  unsigned long tInicio = 0;
+  float alfa = 0;                          // transição suave
+  bool noProtetor = true;                  // incluir no protetor de ecrã (guardado)
+} imagem;
+
 // ---- Estado: sensores --------------------------------------------------------
 struct EstadoIMU {
   enum class Fase : uint8_t { PROCURAR, AGUARDAR_RESET, ATIVO } fase = Fase::PROCURAR;
@@ -419,6 +505,7 @@ struct EstadoIMU {
   float refX = 0, refY = 0, refZ = 1;      // orientação de repouso (calibrada)
   bool  calibrado = false;
   uint16_t amostrasCal = 0;
+  unsigned long tInclinadaParada = 0;      // desde quando está inclinada e imóvel
   float agitacao = 0;                      // |a - gravidade| (g), com decaimento
   uint32_t leiturasOk = 0, leiturasFalhadas = 0;
 } imu;
@@ -456,19 +543,41 @@ struct EstadoUltrassom {
   bool  aguardarEco = false;
   uint8_t semResposta = 0;
   unsigned long tDisparo = 0;
-  float janela[3] = {999, 999, 999};       // mediana de 3
-  uint8_t idx = 0;
-  float distCm = 999;                      // 999 = nada à frente
-  float distRef = 999;                     // referência p/ velocidade
-  unsigned long tRef = 0;
+  // --- leituras
+  float bruto = 999;                       // última leitura crua (cm; 999 = sem eco)
+  float janela[3] = {0, 0, 0};             // mediana de 3 (só leituras VÁLIDAS)
+  uint8_t idx = 0, nJanela = 0;
+  uint8_t falhasSeguidas = 0;              // leituras inválidas seguidas
+  bool  temSalto = false; float salto = 0; // salto suspeito à espera de confirmação
+  uint8_t nConfirma = 0;                   // leituras concordantes já vistas
+  unsigned long tSalto = 0;                // hora da última leitura candidata
+  float saltoIni = 0; unsigned long tSaltoIni = 0;   // 1.ª leitura da cadeia de confirmação
+  uint8_t nSustoPerto = 0;                 // leituras validadas seguidas perto após aproximação
+  float histD[8]; unsigned long histT[8]; uint8_t histN = 0, histI = 0;   // leituras aceites recentes
+  // --- filtro 1€ (Casiez, Roussel & Vogel, CHI 2012)
+  bool  filtroAtivo = false;
+  float filtrada = 999, derivada = 0;      // cm, cm/s (negativo = a aproximar-se)
+  float entradaAnterior = 0;
+  unsigned long tFiltro = 0;
+  bool  apareceuAgora = false;             // primeira leitura após "nada"
+  float qualidade = 1.0f;                  // fração de leituras válidas (média móvel)
+  // --- interpretação
+  float distCm = 999;                      // distância usada pela planta (filtrada)
   bool  pessoaPerto = false;
   unsigned long tPessoaDesde = 0;
-  float distUltima = 999;                  // p/ distinguir pessoa de parede
-  unsigned long tUltimaVariacao = 0;
+  unsigned long tCandidato = 0;            // desde quando o estado "perto/longe" quer mudar
+  unsigned long tUltimaVariacao = 0;       // última vez com atividade (pessoa viva)
+  float histMin[6], histMax[6];            // amplitude por fatias de 0,5 s (janela de 3 s)
+  uint8_t histIdx = 0; unsigned long tHist = 0;
+  // --- diagnóstico elétrico do ECHO
+  uint32_t bordasAnt = 0, bordasS = 0, rajadas = 0; // bordas/s; nº de vezes que foi preciso pausar
+  unsigned long tBordas = 0, tPausa = 0;
+  bool  pausadoRuido = false;
 } us;
 
 volatile unsigned long ecoInicioUs = 0, ecoDuracaoUs = 0;
 volatile bool ecoViuSubida = false, ecoPronto = false;
+volatile uint32_t ecoBordas = 0;                  // contador de bordas (diagnóstico de ruído)
 
 struct EstadoSolo {
   StatusHardware status = StatusHardware::TENTANDO;
@@ -489,6 +598,9 @@ struct EstadoEmocao {
   uint8_t sustosNaJanela = 0;
   unsigned long tUltimaInteracao = 0;
   float energia = ENERGIA_INICIAL;
+  bool baseFixa = false;                   // humor de base FIXO (escolhido na página, guardado)
+  Emocao fixa = Emocao::ESPERA;
+  bool reacoes = true;                     // com humor fixo, continua a reagir (susto, alívio...)?
 } emo;
 
 EstadoSub subs[(uint8_t)Sub::TOTAL];
@@ -540,6 +652,8 @@ struct EstadoOlhos {
   float px = 0, py = 0, vx = 0, vy = 0;    // posição/velocidade da pupila (-1..1)
   float alvoX = 0, alvoY = 0;
   float convergencia = 0;                  // >0 = vesgo
+  float prox = 0;                          // proximidade contínua 0..1 (suavizada por frame)
+  unsigned long tImpulso = 0;              // último sobressalto por aproximação rápida
   unsigned long tProximaSacada = 0;
   unsigned long tInicioPiscar = 0, tProximoPiscar = 0;
   bool  aPiscar = false;
@@ -565,6 +679,7 @@ struct EstadoVisual {
 struct Vagalume { float ax, ay, fx, fy, fase, freqPisca, fasePisca; };
 struct EstadoProtetor {
   TipoProtetor tipo = TipoProtetor::MARE;
+  uint8_t passo = 0;                       // posição na SEQUENCIA_PROTETOR
   unsigned long tInicio = 0;
   float rgb[NUM_LEDS][3];
   uint8_t vida[NUM_LEDS];
@@ -825,9 +940,12 @@ void atualizarEmocao(unsigned long agora) {
   if (emo.transitoriaAtiva && jaChegou(agora, emo.fimTransitoria)) emo.transitoriaAtiva = false;
   if (emo.manualAtiva && jaChegou(agora, emo.fimManual)) emo.manualAtiva = false;
 
+  // Prioridade: reação (se permitida) > escolha de 10 s > humor FIXO > automático
   Emocao alvo;
-  if (emo.transitoriaAtiva)      alvo = emo.transitoria;
+  bool reagir = emo.transitoriaAtiva && (emo.reacoes || !emo.baseFixa);
+  if (reagir)                    alvo = emo.transitoria;
   else if (emo.manualAtiva)      alvo = emo.manual;
+  else if (emo.baseFixa)         alvo = emo.fixa;
   else                           alvo = calcularEmocaoBase(agora);
 
   aplicarEmocao(alvo, agora);
@@ -1147,6 +1265,22 @@ void processarAceleracao(float ax, float ay, float az, float dtMs, unsigned long
   if (!mov.emMovimento && incl > INCLINACAO_ENTRA) mov.emMovimento = true;      // histerese:
   else if (mov.emMovimento && incl < INCLINACAO_SAI) mov.emMovimento = false;   // evita cintilação
 
+  // Postura nova: inclinada mas IMÓVEL durante 5 s deixou de ser um gesto —
+  // é a nova posição de repouso (ex.: pousar na mesa a placa que estava de pé).
+  // Sem isto a planta julgava-se inclinada para sempre: olhar preso e nunca dormia.
+  if (mov.emMovimento && imu.agitacao < 0.05f) {
+    if (!imu.tInclinadaParada) imu.tInclinadaParada = agora;
+    else if (agora - imu.tInclinadaParada > NOVO_REPOUSO_MS) {
+      imu.tInclinadaParada = 0;
+      imu.calibrado = false; imu.amostrasCal = 0;
+      mov.inclX = mov.inclY = 0; mov.emMovimento = false;
+      Serial.println("[IMU] nova posicao de repouso");
+      return;
+    }
+  } else {
+    imu.tInclinadaParada = 0;
+  }
+
   if (mov.emMovimento || dinamica > LIMIAR_INTERACAO_G) registarInteracao(agora);
   if (dinamica > LIMIAR_SUSTO_G) registarSusto(agora);
 }
@@ -1226,6 +1360,7 @@ void atualizarIMU(unsigned long agora) {
 #endif
 void IRAM_ATTR isrEco() {
   unsigned long t = micros();
+  ecoBordas++;
   if (LER_ECHO()) { ecoInicioUs = t; ecoViuSubida = true; }
   else if (ecoViuSubida)         { ecoDuracaoUs = t - ecoInicioUs; ecoPronto = true; }
 }
@@ -1235,32 +1370,163 @@ static float mediana3(float a, float b, float c) {
 }
 
 // Separado da ISR para poder ser testado/injetado
+/*
+ *  TRATAMENTO DAS LEITURAS — camadas (cada uma resolve um defeito medido):
+ *   1. Validação física: só 2-400 cm. Falhas de eco NÃO entram nas contas;
+ *      só ao fim de 4 seguidas (~0,3 s) se declara "nada à frente".
+ *   2. Saltos impossíveis (> 350 cm/s): aceites só se a leitura seguinte
+ *      concordar (filtra ecos espúrios; uma mão que surge é aceite em 70 ms).
+ *   3. Mediana de 3 + filtro 1€: muito suave parado, pouco atraso a mexer.
+ *   4. Presença com confirmação temporal (entra 0,2 s / sai 0,7 s).
+ *   5. Pessoa vs parede pela AMPLITUDE em 3 s (já filtrada), não por leitura.
+ *   6. Susto/interação pela VELOCIDADE filtrada (nunca a partir de falhas).
+ *  Cenários com ruído real: banco_de_testes/ultrassom.cpp.
+ */
+static float alfaEuro(float freqCorte, float dt) {
+  float tau = 1.0f / (2.0f * PI * freqCorte);
+  return 1.0f / (1.0f + tau / dt);
+}
+static void ultrassomNada(unsigned long agora) {
+  us.filtroAtivo = false; us.nJanela = 0; us.temSalto = false; us.nConfirma = 0;
+  us.histN = 0; us.nSustoPerto = 0;
+  us.distCm = 999; us.filtrada = 999; us.derivada = 0;
+  (void)agora;
+}
+static void ultrassomInterpretar(unsigned long agora) {
+  // --- presença com confirmação temporal (histerese em distância E em tempo)
+  bool querPerto = us.pessoaPerto ? (us.distCm <= US_PERTO_SAI_CM) : (us.distCm < US_PERTO_ENTRA_CM);
+  if (querPerto == us.pessoaPerto) us.tCandidato = 0;
+  else {
+    if (!us.tCandidato) us.tCandidato = agora;
+    unsigned long espera = querPerto ? US_PERTO_ENTRA_MS : US_PERTO_SAI_MS;
+    if (agora - us.tCandidato >= espera) {
+      us.pessoaPerto = querPerto; us.tCandidato = 0;
+      if (querPerto) { us.tPessoaDesde = agora; us.tUltimaVariacao = agora; registarInteracao(agora); }
+    }
+  }
+  // --- atividade: amplitude da distância filtrada em fatias de 0,5 s (janela 3 s)
+  if (us.filtroAtivo) {
+    if (!us.tHist || agora - us.tHist >= 500) {
+      us.tHist = agora; us.histIdx = (us.histIdx + 1) % 6;
+      us.histMin[us.histIdx] = us.histMax[us.histIdx] = us.filtrada;
+    }
+    us.histMin[us.histIdx] = min(us.histMin[us.histIdx], us.filtrada);
+    us.histMax[us.histIdx] = max(us.histMax[us.histIdx], us.filtrada);
+    float mn = 999, mx = 0;
+    for (int i = 0; i < 6; i++) { mn = min(mn, us.histMin[i]); mx = max(mx, us.histMax[i]); }
+    if (mx - mn > US_ATIVIDADE_MIN_CM && mx < 999) us.tUltimaVariacao = agora;
+  }
+}
+
+// Susto por aproximação brusca, calculado sobre leituras JÁ VALIDADAS e
+// independente do filtro (que recomeça em saltos): aproximou-se mais de
+// 25 cm em 400 ms e ficou perto (< 30 cm) em 2 leituras seguidas.
+static void ultrassomAvaliarSusto(float d, unsigned long agora) {
+  float maxRecente = 0;
+  for (uint8_t i = 0; i < us.histN; i++)
+    if (agora - us.histT[i] <= US_SUSTO_JANELA_MS) maxRecente = max(maxRecente, us.histD[i]);
+  bool brusco = d < US_SUSTO_DIST_CM && maxRecente - d > US_SUSTO_APROX_CM;
+  bool perto = d < US_SUSTO_DIST_CM;
+  if (!perto) us.nSustoPerto = 0;
+  else if (brusco || us.nSustoPerto > 0) us.nSustoPerto = min(us.nSustoPerto + 1, 3);
+  if (us.nSustoPerto == 2) registarSusto(agora);
+  us.histD[us.histI] = d; us.histT[us.histI] = agora;
+  us.histI = (us.histI + 1) % 8; if (us.histN < 8) us.histN++;
+}
+
 void ultrassomProcessarDuracao(unsigned long duracaoUs, unsigned long agora) {
   // 58 µs/cm ≈ ida e volta a 343 m/s (20 °C). Com DHT: v = 331,3 + 0,606·T
-  float cm = (duracaoUs > 25000UL) ? 999.0f : duracaoUs / 58.0f;
-  us.janela[us.idx] = cm;
-  us.idx = (us.idx + 1) % 3;
-  us.distCm = mediana3(us.janela[0], us.janela[1], us.janela[2]);
-  if (fabsf(us.distCm - us.distUltima) > US_VARIACAO_MIN_CM) us.tUltimaVariacao = agora;
-  us.distUltima = us.distCm;
+  float cm = duracaoUs / 58.0f;
+  us.bruto = (duracaoUs > 25000UL) ? 999.0f : cm;
+  bool valida = duracaoUs <= 25000UL && cm >= US_MIN_CM && cm <= US_MAX_CM;
+  us.qualidade += ((valida ? 1.0f : 0.0f) - us.qualidade) * 0.05f;
 
-  bool antes = us.pessoaPerto;
-  if (!us.pessoaPerto && us.distCm < US_PERTO_ENTRA_CM) us.pessoaPerto = true;
-  else if (us.pessoaPerto && us.distCm > US_PERTO_SAI_CM) us.pessoaPerto = false;
-  if (us.pessoaPerto && !antes) { us.tPessoaDesde = agora; registarInteracao(agora); }
-
-  // Velocidade de aproximação numa janela de ~300 ms
-  if (agora - us.tRef >= 300) {
-    float delta = us.distRef - us.distCm;                       // >0 = aproximou-se
-    if (delta > 25.0f && us.distCm < 30.0f) registarSusto(agora);   // aproximação brusca
-    if (fabsf(delta) > 8.0f && min(us.distCm, us.distRef) < 150.0f) registarInteracao(agora);
-    us.distRef = us.distCm;
-    us.tRef = agora;
+  if (!valida) {                                                  // 1. falha: ignorar...
+    if (++us.falhasSeguidas >= US_FALHAS_PARA_NADA) ultrassomNada(agora);   // ...até ser "nada"
+    ultrassomInterpretar(agora);
+    return;
   }
+  us.falhasSeguidas = 0;
+
+  // 2. salto impossível (ou algo a surgir do "nada")? confirmar com as
+  //    leituras seguintes: um eco espúrio isolado nunca passa daqui.
+  bool suspeito = !us.filtroAtivo;
+  float antes = us.filtrada;
+  if (us.filtroAtivo) {
+    float dt = max(0.02f, (agora - us.tFiltro) / 1000.0f);
+    suspeito = fabsf(cm - us.filtrada) > max(US_SALTO_MIN_CM, US_VEL_MAX_CM_S * dt);
+  }
+  if (suspeito) {
+    // Concordar = estar perto da candidata ANTERIOR, com folga para movimento
+    // real (uma mão a 2 m/s anda 12 cm entre leituras)
+    float folga = US_CONFIRMA_SALTO_CM + US_VEL_MAX_CM_S * min(0.2f, (agora - us.tSalto) / 1000.0f);
+    if (!us.temSalto || fabsf(cm - us.salto) > folga) {
+      us.temSalto = true; us.salto = cm; us.tSalto = agora; us.nConfirma = 0;
+      us.saltoIni = cm; us.tSaltoIni = agora; ultrassomInterpretar(agora); return;
+    }
+    us.salto = cm; us.tSalto = agora;
+    if (++us.nConfirma < US_CONFIRMACOES) { ultrassomInterpretar(agora); return; }
+    // confirmado: é real (algo entrou/saiu do feixe) -> recomeçar o filtro aqui.
+    // A cadeia confirmada também conta como história (ex.: surgiu a 62 cm e
+    // veio a aproximar-se: 62 -> 48 -> 35 cm).
+    us.temSalto = false;
+    us.histD[us.histI] = us.saltoIni; us.histT[us.histI] = us.tSaltoIni;
+    us.histI = (us.histI + 1) % 8; if (us.histN < 8) us.histN++;
+    (void)antes;
+    us.filtroAtivo = false; us.nJanela = 0;
+  } else {
+    us.temSalto = false;
+  }
+
+  // 3. mediana de 3 (de leituras válidas) + filtro 1€
+  us.janela[us.idx] = cm; us.idx = (us.idx + 1) % 3; if (us.nJanela < 3) us.nJanela++;
+  float m = us.nJanela < 3 ? cm : mediana3(us.janela[0], us.janela[1], us.janela[2]);
+  if (!us.filtroAtivo) {
+    bool vinhaDeNada = us.distCm >= 999;
+    us.filtroAtivo = true; us.filtrada = m; us.derivada = 0; us.entradaAnterior = m; us.tFiltro = agora;
+    us.distCm = m;
+    if (vinhaDeNada && m < US_SUSTO_DIST_CM) registarSusto(agora);       // apareceu já muito perto
+    us.tUltimaVariacao = agora;                                            // algo novo surgiu = atividade
+    for (int i = 0; i < 6; i++) { us.histMin[i] = us.histMax[i] = m; }
+    ultrassomAvaliarSusto(m, agora);                                       // conta para o susto
+    ultrassomInterpretar(agora);
+    return;
+  }
+  float dt = max(0.02f, (agora - us.tFiltro) / 1000.0f);
+  us.tFiltro = agora;
+  float dx = (m - us.entradaAnterior) / dt;
+  us.entradaAnterior = m;
+  us.derivada += (dx - us.derivada) * alfaEuro(US_EURO_FREQ_DERIV, dt);
+  float corte = US_EURO_FREQ_MIN + US_EURO_BETA * fabsf(us.derivada);
+  us.filtrada += (m - us.filtrada) * alfaEuro(corte, dt);
+  us.distCm = us.filtrada;
+
+  // 6. reações pela velocidade filtrada
+  ultrassomAvaliarSusto(m, agora);
+  if (fabsf(us.derivada) > US_VEL_INTERACAO_CM_S && us.distCm < 150.0f) registarInteracao(agora);
+  ultrassomInterpretar(agora);
 }
 
 void atualizarUltrassom(unsigned long agora) {
 #if USAR_ULTRASSOM
+  // --- vigilância de rajadas de interrupções no ECHO (1x por segundo)
+  if (agora - us.tBordas >= 1000) {
+    uint32_t b = ecoBordas;
+    us.bordasS = (b - us.bordasAnt) * 1000UL / max(1UL, agora - us.tBordas);
+    us.bordasAnt = b; us.tBordas = agora;
+    if (!us.pausadoRuido && us.bordasS > US_BORDAS_MAX_S) {
+      detachInterrupt(digitalPinToInterrupt(PINO_US_ECHO));
+      us.pausadoRuido = true; us.tPausa = agora; us.rajadas++;
+      us.aguardarEco = false; ecoPronto = false;
+      Serial.printf("[US] RUIDO no ECHO: %lu bordas/s (normal ~29). Interrupcao pausada 5 s. "
+                    "Verifique fio/contacto do ECHO, divisor 1k/2k e GND comum.\n", (unsigned long)us.bordasS);
+    }
+  }
+  if (us.pausadoRuido) {
+    if (agora - us.tPausa < US_PAUSA_RUIDO_MS) return;
+    us.pausadoRuido = false; us.bordasAnt = ecoBordas; us.tBordas = agora;
+    attachInterrupt(digitalPinToInterrupt(PINO_US_ECHO), isrEco, CHANGE);
+  }
   if (us.aguardarEco) {
     if (ecoPronto) {
       unsigned long dur = ecoDuracaoUs;
@@ -1276,7 +1542,7 @@ void atualizarUltrassom(unsigned long agora) {
       if (++us.semResposta >= US_FALHAS_AUSENTE && us.detectado) {
         us.detectado = false;
         us.pessoaPerto = false;
-        us.distCm = 999;
+        ultrassomNada(agora);
         Serial.println("[US] HC-SR04 sem resposta -> considerado desligado");
       }
     }
@@ -1350,7 +1616,7 @@ struct Respiracao { float escala; float fatorBrilho; };
 
 Respiracao atualizarRespiracao(const Expressao& ex, StatusHardware st, float dtMs) {
   float energia01 = emo.energia / 100.0f;
-  float ritmoAlvo = ex.respMin * (0.8f + 0.4f * energia01);       // pouca energia = mais lento
+  float ritmoAlvo = ex.respMin * (0.8f + 0.4f * energia01) * (1.0f + PROX_RITMO_EXTRA * olhos.prox);
   float amplAlvo  = ex.amplitude * (0.7f + 0.3f * energia01);
   if (st == StatusHardware::ERRO) { ritmoAlvo = 26; amplAlvo = 0.10f; }   // "ofegante"
   vis.ritmo     = suavizarExp(vis.ritmo, ritmoAlvo, dtMs, TAU_RITMO_MS);
@@ -1360,9 +1626,12 @@ Respiracao atualizarRespiracao(const Expressao& ex, StatusHardware st, float dtM
 
   float onda = 0.5f - 0.5f * cosf(2.0f * PI * vis.fase);          // 0..1, derivada contínua
   Respiracao r;
-  r.escala = 1.0f - vis.amplitude * (1.0f - onda);                 // inspira = tamanho cheio
+  // Perto: respiração contida -> o rosto fica maior e mais firme ("inclina-se")
+  float ampl = vis.amplitude * (1.0f - PROX_RESPIRACAO_PRESA * olhos.prox);
+  r.escala = 1.0f - ampl * (1.0f - onda);                          // inspira = tamanho cheio
   float intensidade = ex.intensidade * (0.75f + 0.25f * energia01);
-  r.fatorBrilho = BRILHO_BASE * intensidade * (1.0f - MODULACAO_BRILHO + MODULACAO_BRILHO * 2.0f * onda);
+  r.fatorBrilho = BRILHO_BASE * intensidade * (1.0f - MODULACAO_BRILHO + MODULACAO_BRILHO * 2.0f * onda)
+                 * (1.0f + PROX_BRILHO_EXTRA * olhos.prox);
   return r;
 }
 
@@ -1436,11 +1705,25 @@ void suavizarCor(const float* rgbAlvo, float dtMs, float* rgbSaida) {
  * ============================================================================
  */
 // Pupilas: mola (puxa para o alvo) + amortecedor + "gravidade" da inclinação
+// Proximidade alvo (0..1) a partir da distância filtrada; 0 se não há nada
+// útil à frente (sem sensor, nada, ou objeto imóvel há muito = mobília).
+float alvoProximidade(unsigned long agora) {
+  if (!us.detectado || us.distCm >= 999 || us.pausadoRuido) return 0;
+  if (agora - us.tUltimaVariacao >= US_OBJETO_ESTATICO_MS) return 0;
+  float t = (PROX_LONGE_CM - us.distCm) / (PROX_LONGE_CM - PROX_PERTO_CM);
+  return suaveStep(limitar(t, 0, 1));
+}
+
 void atualizarOlhos(float dtMs, unsigned long agora) {
   float dt = dtMs / 1000.0f;
 
+  // 0. Proximidade contínua: sobe depressa, desce devagar (interpola as
+  //    leituras de 16/s para 100 FPS — é isto que torna o movimento fluido)
+  float alvoP = alvoProximidade(agora);
+  olhos.prox = suavizarExp(olhos.prox, alvoP, dtMs, alvoP > olhos.prox ? PROX_SOBE_MS : PROX_DESCE_MS);
+
   // 1. Escolher o alvo do olhar
-  bool pessoa = pessoaPresente(agora);
+  bool pessoa = pessoaPresente(agora) || olhos.prox > 0.08f;     // repara logo, antes da "presença"
   if (pessoa) {
     olhos.alvoX = 0; olhos.alvoY = 0;                            // olha para a pessoa
     olhos.tProximaSacada = agora + 1500;
@@ -1450,8 +1733,16 @@ void atualizarOlhos(float dtMs, unsigned long agora) {
     olhos.alvoY = voltarCentro ? 0 : aleatorio(-0.4f, 0.4f);
     olhos.tProximaSacada = agora + (unsigned long)aleatorio(3000, 7000);
   }
-  float alvoConv = (pessoa && us.distCm < US_VESGO_CM) ? 0.7f : 0.0f;
-  olhos.convergencia = suavizarExp(olhos.convergencia, alvoConv, dtMs, 200);
+  // Convergência proporcional à distância (25 -> 10 cm), sem limiar
+  float alvoConv = 0;
+  if (olhos.prox > 0 && us.distCm < 999)
+    alvoConv = 0.7f * suaveStep(limitar((PROX_VESGO_INICIO_CM - us.distCm) / (PROX_VESGO_INICIO_CM - PROX_PERTO_CM), 0, 1));
+  olhos.convergencia = suavizarExp(olhos.convergencia, alvoConv, dtMs, 120);
+  // Aproximação rápida: impulso na física da pupila (sobe e volta com mola)
+  if (olhos.prox > 0.1f && us.derivada < -PROX_IMPULSO_VEL_CM_S && agora - olhos.tImpulso > PROX_IMPULSO_PAUSA_MS) {
+    olhos.vy -= limitar(-us.derivada / 60.0f, 0.8f, 3.0f);
+    olhos.tImpulso = agora;
+  }
 
   // 2. Integrar a física (Euler semi-implícito, estável para este dt)
   // A inclinação vem no referencial da matriz; o rosto pode estar rodado:
@@ -1644,6 +1935,31 @@ void protetorVagalumes(unsigned long agora) {
   }
 }
 
+// Seiva: uma faixa de luz suave sobe das raízes à copa (±18%), lenta e contínua.
+// Dá vida à imagem sem piscar (regra do projeto). Usada no protetor e no "Mostrar".
+float fatorSeiva(int linha, unsigned long agora) {
+  float fase = (agora % PERIODO_SEIVA_MS) / (float)PERIODO_SEIVA_MS;      // 0..1
+  float pos = 1.25f - fase * 1.5f;                                        // de baixo (1,25) para cima (-0,25)
+  float y = linha / 7.0f;
+  float onda = expf(-(y - pos) * (y - pos) / 0.03f);
+  return 0.82f + 0.18f * onda;
+}
+void protetorLogo(unsigned long agora) {
+  for (int y = 0; y < ALTURA; y++) {
+    float f = fatorSeiva(y, agora);
+    for (int x = 0; x < LARGURA; x++)
+      for (int k = 0; k < 3; k++) prot.rgb[y * LARGURA + x][k] = IMAGEM_DUMANGUE[y * LARGURA + x][k] * f;
+  }
+}
+// Sequência: as animações alternam com a imagem DuMangue
+const TipoProtetor SEQUENCIA_PROTETOR[] = {
+  TipoProtetor::MARE, TipoProtetor::LOGO, TipoProtetor::VIDA, TipoProtetor::LOGO, TipoProtetor::VAGALUMES, TipoProtetor::LOGO,
+};
+const uint8_t PASSOS_PROTETOR = sizeof(SEQUENCIA_PROTETOR) / sizeof(SEQUENCIA_PROTETOR[0]);
+static inline unsigned long duracaoProtetor(TipoProtetor t) {
+  return t == TipoProtetor::LOGO ? DURACAO_PROT_LOGO_MS : DURACAO_CADA_PROT_MS;
+}
+
 void iniciarProtetor(TipoProtetor tipo, unsigned long agora) {
   prot.tipo = tipo;
   prot.tInicio = agora;
@@ -1655,16 +1971,22 @@ void iniciarProtetor(TipoProtetor tipo, unsigned long agora) {
 
 // Devolve o "alfa de ciclo" (fade entre protetores)
 float renderizarProtetor(unsigned long agora, float dtMs) {
-  if (agora - prot.tInicio >= DURACAO_CADA_PROT_MS)
-    iniciarProtetor((TipoProtetor)(((uint8_t)prot.tipo + 1) % (uint8_t)TipoProtetor::TOTAL), agora);
+  if (agora - prot.tInicio >= duracaoProtetor(prot.tipo)) {
+    // próximo passo da sequência (salta a imagem se foi desativada na página)
+    uint8_t p = prot.passo;
+    do { p = (p + 1) % PASSOS_PROTETOR; } while (SEQUENCIA_PROTETOR[p] == TipoProtetor::LOGO && !imagem.noProtetor);
+    prot.passo = p;
+    iniciarProtetor(SEQUENCIA_PROTETOR[p], agora);
+  }
   switch (prot.tipo) {
     case TipoProtetor::MARE:      protetorMare(agora); break;
     case TipoProtetor::VIDA:      protetorVida(agora, dtMs); break;
     case TipoProtetor::VAGALUMES: protetorVagalumes(agora); break;
+    case TipoProtetor::LOGO:      protetorLogo(agora); break;
     default: break;
   }
   unsigned long t = agora - prot.tInicio;
-  return min(suaveStep(t / 1000.0f), suaveStep((DURACAO_CADA_PROT_MS - t) / 1000.0f));
+  return min(suaveStep(t / 1000.0f), suaveStep((duracaoProtetor(prot.tipo) - t) / 1000.0f));
 }
 
 /*
@@ -1677,7 +1999,7 @@ void mudarModo(ModoEcra m, unsigned long agora) {
   Serial.printf("[UI] modo %s -> %s\n", nomeModo(vis.modo), nomeModo(m));
   vis.modo = m;
   vis.tModo = agora;
-  if (m == ModoEcra::PROTETOR) iniciarProtetor(TipoProtetor::MARE, agora);
+  if (m == ModoEcra::PROTETOR) { prot.passo = 0; iniciarProtetor(SEQUENCIA_PROTETOR[0], agora); }
   if (m == ModoEcra::ACORDAR) olhos.tProximoPiscar = agora + DURACAO_ACORDAR_MS + 250;  // pisca ao acordar
 }
 
@@ -1685,7 +2007,7 @@ void atualizarModo(unsigned long agora, float dtMs) {
   unsigned long t = agora - vis.tModo;
   bool interacaoRecente = emo.tUltimaInteracao != 0 && agora - emo.tUltimaInteracao < 1000;
   unsigned long inativo = agora - max(emo.tUltimaInteracao, vis.tModo);
-  bool algoAcontecer = emo.transitoriaAtiva || emo.manualAtiva || rede.estado == EstadoRede::PORTAL || painel.ativo;
+  bool algoAcontecer = emo.transitoriaAtiva || emo.manualAtiva || rede.estado == EstadoRede::PORTAL || painel.ativo || imagem.ativa;
   if (painel.ativo && painel.arranque) {                          // ao ligar: checklist primeiro,
     vis.tModo = agora;                                            // depois as pálpebras abrem
     olhos.tProximoPiscar = agora + DURACAO_ACORDAR_MS + 250;
@@ -2036,6 +2358,10 @@ void renderizarFrame(unsigned long agora) {
   const uint8_t* corAviso = COR_PORTAL;
   float alfaAviso = atualizarAviso(agora, icone, corAviso);
 
+  // Imagem DuMangue escolhida na página (por cima do rosto; o painel fica acima dela)
+  if (imagem.ativa && !imagem.manter && agora - imagem.tInicio >= DURACAO_IMAGEM_MS) imagem.ativa = false;
+  imagem.alfa = suavizarExp(imagem.alfa, imagem.ativa ? 1.0f : 0.0f, dtMs, 180.0f);
+
   // Painel de estado (camada 2)
   memset(rgbPainel, 0, sizeof(rgbPainel));
   float alfaPainel = renderizarPainel(agora, rgbPainel);
@@ -2063,6 +2389,11 @@ void renderizarFrame(unsigned long agora) {
         if (rosto[i] > 0.5f && cor[k] >= 4.0f && v < 1.0f && alfaProt < 0.5f) v = 1.0f;  // piso
         if (alfaAviso > 0) v = misturar(v, corAviso[k] * icone[i] * BRILHO_AVISO * geral, alfaAviso);
         if (alfaProt > 0.01f) v = misturar(v, prot.rgb[i][k] * BRILHO_PROTETOR * geral * alfaCiclo, alfaProt);
+        if (imagem.alfa > 0.01f) {
+          float iv = IMAGEM_DUMANGUE[i][k] * fatorSeiva(y, agora) * BRILHO_IMAGEM * geral;
+          if (IMAGEM_DUMANGUE[i][k] >= 4 && iv < 1.0f) iv = 1.0f;
+          v = misturar(v, iv, imagem.alfa);
+        }
         if (alfaPainel > 0) {
           float pv = rgbPainel[i][k] * BRILHO_PAINEL * geral;
           if (rgbPainel[i][k] >= 4.0f && pv < 1.0f) pv = 1.0f;     // ícone nunca some
@@ -2127,6 +2458,9 @@ body{font-family:system-ui,sans-serif;background:var(--fundo);color:#e6f2ec;max-
 h1{font-size:1.4em;margin:.2em 0;color:var(--acento);transition:color 1.2s}.card{background:var(--cartao);border-radius:12px;padding:12px;margin:10px 0;transition:background 1.2s}
 #espelho{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;background:#050505;padding:8px;border-radius:10px;max-width:240px;margin:auto}
 #espelho i{aspect-ratio:1;border-radius:50%;background:#151515}
+.chip{font-size:.75em;padding:2px 8px;border-radius:10px;background:var(--acento);color:#0b1410;display:none}
+.minigrade{display:grid;grid-template-columns:repeat(8,11px);gap:2px;background:#050505;padding:6px;border-radius:8px}
+.minigrade i{width:11px;height:11px;border-radius:50%;background:#151515}
 #painelWeb{display:grid;grid-template-columns:repeat(8,11px);gap:2px;background:#050505;padding:6px;border-radius:8px}
 #painelWeb i{width:11px;height:11px;border-radius:50%;background:#151515}
 .selo{font-size:.55em;vertical-align:middle;padding:3px 10px;border-radius:12px;background:#333;color:#fff;margin-left:6px}
@@ -2164,6 +2498,20 @@ button:hover{background:#2a5240}.bar{height:10px;background:#0a120e;border-radiu
 <button onclick="post('/api/protetor')">Protetor</button><button onclick="post('/api/calibrar')">Calibrar repouso</button></div>
 <p>Brilho geral: <b id="brv">-</b></p><input type="range" id="brilho" min="5" max="100" step="5" style="width:100%"
 oninput="$('brv').textContent=this.value+'%'" onchange="post('/api/brilho?valor='+this.value)"></div>
+<div class="card"><p>Humor de base <small>· permanente</small> <span id="humorChip" class="chip"></span></p>
+<small>Diferente dos botões acima (que duram 10 s): aqui escolhe o humor em que a planta <b>fica</b>, mesmo depois de reiniciar.</small>
+<select id="humor" onchange="mudarHumor()" style="width:100%;margin-top:8px;padding:8px;font-size:1em;background:var(--botao);color:#e6f2ec;border:1px solid var(--borda);border-radius:8px">
+<option value="auto">Automático — segue os sensores e a energia</option></select>
+<label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="reacoes" onchange="post('/api/humor?reacoes='+(this.checked?1:0))" style="width:20px;height:20px">
+<small>Continuar a reagir (susto, alívio, confusão) e depois voltar a este humor</small></label></div>
+<div class="card"><p>Imagem DuMangue</p>
+<div style="display:flex;gap:14px;align-items:center"><div id="imgWeb" class="minigrade"></div>
+<div style="flex:1"><div class="g"><button onclick="post('/api/imagem?acao=mostrar')">Mostrar (15 s)</button>
+<button onclick="post('/api/imagem?acao=manter')">Manter na tela</button></div>
+<button style="width:100%;margin-top:6px" onclick="post('/api/imagem?acao=parar')">Voltar ao rosto</button>
+<label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="imgProt" onchange="post('/api/imagem?protetor='+(this.checked?1:0))" style="width:20px;height:20px">
+<small>Mostrar no protetor de tela (alterna com as animações)</small></label>
+<small id="imgEstado"></small></div></div></div>
 <div class="card"><p>Paleta de cores</p>
 <select id="paleta" onchange="mudarPaleta()" style="width:100%;padding:8px;font-size:1em;background:var(--botao);color:#e6f2ec;border:1px solid var(--borda);border-radius:8px">
 <option value="mangue">Mangue (original)</option><option value="oceano">Oceano</option><option value="por_do_sol">Pôr do sol</option>
@@ -2197,6 +2545,8 @@ Se mostrou <b>azul</b> no "VERMELHO", experimente BRG ou BGR. Escolha e teste de
 <div class="card"><small id="sis">-</small></div>
 <script>
 const E=['espera','alegria','sede','susto','amor','raiva','sono','curioso','confuso'];
+E.forEach(e=>{const o=document.createElement('option');o.value=e;o.textContent='🔒 '+e.charAt(0).toUpperCase()+e.slice(1);$('humor').appendChild(o)});
+function mudarHumor(){post('/api/humor?nome='+$('humor').value)}
 const B=document.getElementById('botoes');E.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>acao(e);B.appendChild(b)});
 function post(u){return fetch(u,{method:'POST'}).then(atualizar)}
 function acao(e){return post('/api/emocao?nome='+e)}
@@ -2254,14 +2604,21 @@ for(let i=0;i<64;i++){const c=[0,1,2].map(k=>parseInt(t.substr(i*6+k*2,2),16));p
 px.forEach((c,i)=>{const v=c.map(x=>Math.round(Math.pow(x/m,0.6)*255));ESP.children[i].style.background=(c[0]|c[1]|c[2])?'rgb('+v.join(',')+')':'#151515';
 ESP.children[i].style.boxShadow=(c[0]|c[1]|c[2])?'0 0 8px rgb('+v.join(',')+')':'none'})}catch(e){}}
 setInterval(espelhar,250);
+// pré-visualização da imagem (os mesmos valores que vão para os LEDs)
+(async()=>{try{const t=await(await fetch('/api/imagem')).text();const G=$('imgWeb');for(let i=0;i<64;i++){const e=document.createElement('i');
+const c=[0,1,2].map(k=>parseInt(t.substr(i*6+k*2,2),16));if(c[0]|c[1]|c[2]){const v='rgb('+c.join(',')+')';e.style.background=v;e.style.boxShadow='0 0 5px '+v}G.appendChild(e)}}catch(e){}})();
 function mudarPaleta(){const p=$('paleta').value;let u='/api/paleta?nome='+p;
 if(p=='cor_unica')u+='&cor='+$('cor').value.substring(1);$('linhaCor').style.display=p=='cor_unica'?'block':'none';
 fetch(u,{method:'POST'}).then(r=>r.json()).then(j=>{if(!j.ok)alert(j.erro)}).then(atualizar)}
 async function atualizar(){try{const s=await(await fetch('/api/estado')).json();
-$('emocao').textContent=s.emocao+(s.manual?' (manual)':'');$('modo').textContent=s.modo;
+$('emocao').textContent=s.emocao+(s.manual?' (10 s)':(s.humor.fixo&&s.emocao==s.humor.fixo?' (fixo)':''));
+if(document.activeElement!==$('humor'))$('humor').value=s.humor.fixo||'auto';
+if(document.activeElement!==$('reacoes'))$('reacoes').checked=s.humor.reacoes;
+$('reacoes').disabled=!s.humor.fixo;$('reacoes').parentElement.style.opacity=s.humor.fixo?1:.5;
+$('humorChip').style.display=s.humor.fixo?'inline':'none';$('humorChip').textContent=s.humor.fixo?'🔒 '+s.humor.fixo:'';$('modo').textContent=s.modo;
 $('status').textContent=(SELO[s.nivel]||['-'])[0];$('rede').textContent=s.rede;
 $('solo').textContent=s.solo.ativo?(s.solo.pct+'%'+(s.solo.sede?' sede':'')):'desligado';
-$('dist').textContent=s.us.detectado?(s.us.cm>=999?'nada':s.us.cm.toFixed(0)+' cm'):'sem sensor';
+$('dist').textContent=s.us.rajadas>0&&s.us.bordas_s>300?'ruído elétrico no ECHO':(s.us.detectado?(s.us.cm>=999?'nada à frente':s.us.cm.toFixed(0)+' cm'+(s.us.qualidade<80?' · leitura instável':'')):'sem sensor');
 $('incl').textContent=s.imu.inclX.toFixed(2)+' / '+s.imu.inclY.toFixed(2)+' g';$('resp').textContent=s.resp.toFixed(0)+' /min';
 $('energia').style.width=s.energia+'%';
 if(document.activeElement!==$('brilho')){$('brilho').value=s.brilho;$('brv').textContent=s.brilho+'%'}
@@ -2274,6 +2631,8 @@ $('rotPos').textContent=s.rot.graus+'°'+(s.rot.auto?'':' (fixa)');
 $('rotEix').textContent='Montagem do sensor: '+s.rot.eixos+'°'+(s.rot.espelho?' (espelhado)':'');
 $('rotMed').textContent=s.rot.vertical?('chão medido a '+s.rot.medido+'°'):'placa deitada: orientação mantida';
 const tt=$('testeTxt');if(s.teste>=0){tt.textContent='A placa deve estar: '+NOMES_TESTE[s.teste][0];tt.style.color=NOMES_TESTE[s.teste][1]}else tt.textContent='';
+if(document.activeElement!==$('imgProt'))$('imgProt').checked=s.imagem.no_protetor;
+$('imgEstado').textContent=s.imagem.ativa?(s.imagem.manter?'Na tela (até "Voltar ao rosto")':'Na tela (15 s)'):'';
 aplicarTema(s);falhas=0;$('offline').style.display='none';
 $('amostras').innerHTML=s.cores.map((c,i)=>'<div title="'+E[i]+'" style="height:22px;border-radius:5px;background:'+c+(E[i]==s.emocao?';outline:2px solid #fff':'')+'"></div>').join('');
 $('sis').textContent='uptime '+s.sistema.uptime_s+' s · RSSI '+s.sistema.rssi+' dBm · heap '+s.sistema.heap+' B · pilha livre '+s.sistema.pilha_livre+' B · loop máx '+s.sistema.loop_max_us+' µs · '+s.sistema.fps+' FPS · último reinício: '+s.sistema.reinicio+(s.sistema.crash_em?' em '+s.sistema.crash_em:'');
@@ -2284,18 +2643,18 @@ let falhas=0;setInterval(atualizar,500);atualizar();saude();
 void rotaRaiz() { server.send_P(200, "text/html; charset=utf-8", PAGINA_HTML); }
 
 void rotaEstado() {
-  static char json[1100];                                         // estático: fora da pilha
+  static char json[1400];                                         // estático: fora da pilha
   snprintf(json, sizeof(json),
     "{\"emocao\":\"%s\",\"manual\":%s,\"modo\":\"%s\",\"status\":\"%s\",\"rede\":\"%s\",\"energia\":%.0f,\"resp\":%.1f,\"brilho\":%u,"
     "\"imu\":{\"status\":\"%s\",\"calibrado\":%s,\"inclX\":%.2f,\"inclY\":%.2f,\"agitacao\":%.2f,\"ok\":%lu,\"falhas\":%lu},"
-    "\"us\":{\"detectado\":%s,\"cm\":%.0f,\"perto\":%s},"
+    "\"us\":{\"detectado\":%s,\"cm\":%.0f,\"perto\":%s,\"bruto\":%.0f,\"qualidade\":%.0f,\"vel\":%.0f,\"bordas_s\":%lu,\"rajadas\":%lu,\"prox\":%.2f},"
     "\"solo\":{\"ativo\":%s,\"status\":\"%s\",\"mv\":%.0f,\"pct\":%d,\"sede\":%s},"
     "\"sistema\":{\"uptime_s\":%lu,\"rssi\":%d,\"heap\":%lu,\"loop_max_us\":%lu,\"fps\":%lu,\"pilha_livre\":%lu,\"reinicio\":\"%s\",\"crash_em\":\"%s\",\"crashes\":%u}",
     expressaoDe(emo.atual).nome, emo.manualAtiva ? "true" : "false", nomeModo(vis.modo),
     nomeStatus(statusGeral()), nomeRede(rede.estado), emo.energia, vis.ritmo, (unsigned)brilhoGeralPct,
     nomeStatus(imu.status), imu.calibrado ? "true" : "false", mov.inclX, mov.inclY, imu.agitacao,
     (unsigned long)imu.leiturasOk, (unsigned long)imu.leiturasFalhadas,
-    us.detectado ? "true" : "false", us.distCm, pessoaPresente(millis()) ? "true" : "false",
+    us.detectado ? "true" : "false", us.distCm, pessoaPresente(millis()) ? "true" : "false", us.bruto, us.qualidade * 100.0f, us.derivada, (unsigned long)us.bordasS, (unsigned long)us.rajadas, olhos.prox,
     (USAR_SENSOR_SOLO && solo.presente) ? "true" : "false", nomeStatus(solo.status), solo.mvFiltrado, solo.percentagem,
     solo.comSede ? "true" : "false",
     millis() / 1000UL, (int)WiFi.RSSI(), (unsigned long)ESP.getFreeHeap(),
@@ -2306,9 +2665,11 @@ void rotaEstado() {
   size_t n = strlen(json);
   float atual[3]; oklchParaRgb(vis.corLch, atual);
   n += snprintf(json + n, sizeof(json) - n,
-                ",\"rot\":{\"auto\":%s,\"graus\":%d,\"medido\":%d,\"vertical\":%s,\"eixos\":%d,\"espelho\":%s,\"modo_girar\":%s},\"ordem\":\"%s\",\"teste\":%d,\"nivel\":\"%s\",\"cor_atual\":\"#%02X%02X%02X\",\"paleta\":\"%s\",\"cor\":\"#%06lX\",\"cores\":[",
+                ",\"rot\":{\"auto\":%s,\"graus\":%d,\"medido\":%d,\"vertical\":%s,\"eixos\":%d,\"espelho\":%s,\"modo_girar\":%s},\"humor\":{\"fixo\":\"%s\",\"reacoes\":%s},\"imagem\":{\"ativa\":%s,\"manter\":%s,\"no_protetor\":%s},\"ordem\":\"%s\",\"teste\":%d,\"nivel\":\"%s\",\"cor_atual\":\"#%02X%02X%02X\",\"paleta\":\"%s\",\"cor\":\"#%06lX\",\"cores\":[",
                 rot.automatica ? "true" : "false", rot.quarto * 90, (int)(lroundf(rot.anguloMedido) % 360), rot.vertical ? "true" : "false",
                 eixos.quarto * 90, eixos.espelho ? "true" : "false", botao.modoGirar ? "true" : "false",
+                emo.baseFixa ? EXPRESSOES[(uint8_t)emo.fixa].nome : "", emo.reacoes ? "true" : "false",
+                imagem.ativa ? "true" : "false", imagem.manter ? "true" : "false", imagem.noProtetor ? "true" : "false",
                 ORDENS_COR[ordemCor].nome, (int)faseTesteCor(millis()),
                 NOMES_NIVEL[(uint8_t)nivelGeral()], (int)atual[0], (int)atual[1], (int)atual[2],
                 NOMES_PALETA[(uint8_t)paletaAtual], (unsigned long)corUnica);
@@ -2337,6 +2698,32 @@ void rotaEmocao() {
     }
   }
   server.send(400, "application/json", "{\"ok\":false,\"erro\":\"emocao desconhecida\"}");
+}
+
+// POST /api/humor?nome=<emocao|auto>[&reacoes=1|0] -> humor de base permanente
+void rotaHumor() {
+  String nome = server.arg("nome");
+  if (server.hasArg("reacoes")) {
+    String r = server.arg("reacoes");
+    if (!(r.equalsIgnoreCase("1") || r.equalsIgnoreCase("0"))) { server.send(400, "application/json", "{\"ok\":false,\"erro\":\"reacoes deve ser 0 ou 1\"}"); return; }
+    emo.reacoes = r.equalsIgnoreCase("1");
+    preferencias.putUChar("reacoes", emo.reacoes ? 1 : 0);
+    if (nome.length() == 0) { server.send(200, "application/json", "{\"ok\":true}"); return; }
+  }
+  if (nome.equalsIgnoreCase("auto")) {
+    emo.baseFixa = false;
+    preferencias.putUChar("humor", 255);
+  } else {
+    int8_t idx = -1;
+    for (uint8_t i = 0; i < (uint8_t)Emocao::TOTAL; i++) if (nome.equalsIgnoreCase(EXPRESSOES[i].nome)) idx = i;
+    if (idx < 0) { server.send(400, "application/json", "{\"ok\":false,\"erro\":\"emocao desconhecida\"}"); return; }
+    emo.baseFixa = true;
+    emo.fixa = (Emocao)idx;
+    emo.manualAtiva = false;                                      // a escolha permanente substitui a temporária
+    preferencias.putUChar("humor", (uint8_t)idx);
+  }
+  registarInteracao(millis());
+  server.send(200, "application/json", "{\"ok\":true}");
 }
 
 void rotaAcordar()  { registarInteracao(millis()); server.send(200, "application/json", "{\"ok\":true}"); }
@@ -2514,6 +2901,46 @@ void rotaSaude() {
   server.send(200, "application/json", json);
 }
 
+// GET /api/imagem -> a imagem 8x8 em "RRGGBB"×64 (pré-visualização na página)
+void rotaImagemGet() {
+  static const char HEX_[] = "0123456789ABCDEF";
+  static char txt[NUM_LEDS * 6 + 1];
+  for (int i = 0; i < NUM_LEDS; i++)
+    for (int k = 0; k < 3; k++) {
+      txt[i * 6 + k * 2] = HEX_[IMAGEM_DUMANGUE[i][k] >> 4];
+      txt[i * 6 + k * 2 + 1] = HEX_[IMAGEM_DUMANGUE[i][k] & 0xF];
+    }
+  txt[NUM_LEDS * 6] = '\0';
+  server.send(200, "text/plain", txt);
+}
+// POST /api/imagem?acao=mostrar|manter|parar   (mostrar = 15 s)
+// POST /api/imagem?protetor=1|0                (incluir no protetor de ecrã)
+void rotaImagemPost() {
+  unsigned long agora = millis();
+  if (server.hasArg("protetor")) {
+    String p = server.arg("protetor");
+    if (!(p.equalsIgnoreCase("1") || p.equalsIgnoreCase("0"))) { server.send(400, "application/json", "{\"ok\":false,\"erro\":\"protetor deve ser 0 ou 1\"}"); return; }
+    imagem.noProtetor = p.equalsIgnoreCase("1");
+    preferencias.putUChar("logoprot", imagem.noProtetor ? 1 : 0);
+    server.send(200, "application/json", "{\"ok\":true}");
+    return;
+  }
+  String a = server.arg("acao");
+  if (a.equalsIgnoreCase("mostrar") || a.equalsIgnoreCase("manter")) {
+    imagem.ativa = true;
+    imagem.manter = a.equalsIgnoreCase("manter");
+    imagem.tInicio = agora;
+    registarInteracao(agora);                                     // acorda, se estiver a dormir
+  } else if (a.equalsIgnoreCase("parar")) {
+    imagem.ativa = false;
+    imagem.manter = false;
+  } else {
+    server.send(400, "application/json", "{\"ok\":false,\"erro\":\"acao: mostrar, manter ou parar\"}");
+    return;
+  }
+  server.send(200, "application/json", "{\"ok\":true}");
+}
+
 void rotaMatriz() {
   static const char HEX_[] = "0123456789ABCDEF";
   static char txt[NUM_LEDS * 6 + 1];
@@ -2533,11 +2960,14 @@ void configurarRotas() {
   server.on("/api/estado", HTTP_GET, rotaEstado);
   server.on("/api/emocao", HTTP_POST, rotaEmocao);
   server.on("/api/acordar", HTTP_POST, rotaAcordar);
+  server.on("/api/humor", HTTP_POST, rotaHumor);
   server.on("/api/protetor", HTTP_POST, rotaProtetor);
   server.on("/api/calibrar", HTTP_POST, rotaCalibrar);
   server.on("/api/brilho", HTTP_POST, rotaBrilho);
   server.on("/api/paleta", HTTP_POST, rotaPaleta);
   server.on("/api/matriz", HTTP_GET, rotaMatriz);
+  server.on("/api/imagem", HTTP_GET, rotaImagemGet);
+  server.on("/api/imagem", HTTP_POST, rotaImagemPost);
   server.on("/api/saude", HTTP_GET, rotaSaude);
   server.on("/api/teste_cor", HTTP_POST, rotaTesteCor);
   server.on("/api/painel", HTTP_POST, rotaPainel);
@@ -2589,9 +3019,9 @@ void registarDiagnostico(uint32_t duracaoUs, unsigned long agora) {
     diag.tJanela = agora;
   }
   if (temporizador(tLog, INTERVALO_LOG_MS, agora)) {
-    Serial.printf("[ESTADO] %s | modo %s | sens %s | rede %s | energia %.0f | resp %.0f/min | incl %.2f/%.2f | dist %.0f | solo %d%% | loop max %lu us | %lu FPS\n",
+    Serial.printf("[ESTADO] %s | modo %s | sens %s | rede %s | energia %.0f | resp %.0f/min | incl %.2f/%.2f | dist %.0f (eco %lu/s) | solo %d%% | loop max %lu us | %lu FPS\n",
                   expressaoDe(emo.atual).nome, nomeModo(vis.modo), nomeStatus(statusGeral()), nomeRede(rede.estado),
-                  emo.energia, vis.ritmo, mov.inclX, mov.inclY, us.distCm, solo.percentagem,
+                  emo.energia, vis.ritmo, mov.inclX, mov.inclY, us.distCm, (unsigned long)us.bordasS, solo.percentagem,
                   (unsigned long)diag.loopMaxUsPublicado, (unsigned long)diag.fps);
     if (agora < 60000UL || reinicio.foiCrash) imprimirReinicio();   // repete: o monitor apanha-o
   }
@@ -2617,6 +3047,11 @@ void setup() {
   if (!rot.automatica) { rot.quarto = rot.quartoFixo; rot.anguloExibido = rot.quartoFixo * 90.0f; }
   eixos.quarto = preferencias.getUChar("eixq", CORRECAO_EIXOS_PADRAO) & 3;
   eixos.espelho = preferencias.getUChar("eixm", ESPELHO_EIXOS_PADRAO) != 0;
+  imagem.noProtetor = preferencias.getUChar("logoprot", 1) != 0;
+  { uint8_t h = preferencias.getUChar("humor", 255);
+    emo.baseFixa = h < (uint8_t)Emocao::TOTAL;
+    if (emo.baseFixa) emo.fixa = (Emocao)h;
+    emo.reacoes = preferencias.getUChar("reacoes", 1) != 0; }
   ordemCor = preferencias.getUChar("ordem", ORDEM_COR_PADRAO);
   if (ordemCor >= NUM_ORDENS_COR) ordemCor = ORDEM_COR_PADRAO;
   matriz.updateType(ORDENS_COR[ordemCor].tipo + NEO_KHZ800);
@@ -2679,4 +3114,3 @@ void loop() {
 
   registarDiagnostico(micros() - t0, agora);
 }
-
